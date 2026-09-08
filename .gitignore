@@ -1,21 +1,29 @@
 # Maven
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Java class files
+*.class
 *.jar
 *.war
 *.ear
 
-# IDEs
+# IntelliJ IDEA
 .idea/
 *.iml
-.vscode/
-.classpath
-.project
-.settings/
+*.iws
+*.ipr
+out/
 
-# OS generated files
+# SQLite temporary journal/WAL files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS files
 .DS_Store
 Thumbs.db
-
-# Database (Local data should not be tracked)
-data/
-*.db
