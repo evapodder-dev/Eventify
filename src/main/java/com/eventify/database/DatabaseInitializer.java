@@ -182,7 +182,7 @@ public class DatabaseInitializer {
                     ps.setString(6, "14:00");
                     ps.setString(7, "CSE Lab Complex 301");
                     ps.setString(8, "CSE Computer Club");
-                    ps.setString(9, 120);
+                    ps.setInt(9, 120);
                     ps.setString(10, "Upcoming");
                     ps.executeUpdate();
 
@@ -194,7 +194,7 @@ public class DatabaseInitializer {
                     ps.setString(6, "13:00");
                     ps.setString(7, "Software Engineering Lab 204");
                     ps.setString(8, "Department of CSE");
-                    ps.setString(9, 60);
+                    ps.setInt(9, 60);
                     ps.setString(10, "Ongoing");
                     ps.executeUpdate();
 
@@ -206,7 +206,7 @@ public class DatabaseInitializer {
                     ps.setString(6, "17:30");
                     ps.setString(7, "Central Auditorium");
                     ps.setString(8, "IEEE Student Branch");
-                    ps.setString(9, 250);
+                    ps.setInt(9, 250);
                     ps.setString(10, "Completed");
                     ps.executeUpdate();
                 }
@@ -271,3 +271,4 @@ public class DatabaseInitializer {
         }
     }
 }
+
