@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="720.0" prefWidth="1180.0"
+            style="-fx-background-color: #f1f5f9;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.eventify.controller.DashboardController">
+
+    <left>
+        <VBox prefWidth="235.0" spacing="8.0" style="-fx-background-color: #0f172a;">
+            <padding>
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0"/>
+            </padding>
+
+            <Label text="EVENTIFY" textFill="#38bdf8">
+                <font>
+                    <Font name="System Bold" size="24.0"/>
+                </font>
+            </Label>
+            <Label fx:id="userRoleLabel" text="Organizer Portal" textFill="#94a3b8">
+                <font>
+                    <Font size="12.0"/>
+                </font>
+                <padding>
+                    <Insets bottom="16.0"/>
+                </padding>
+            </Label>
+
+            <Button maxWidth="Infinity" onAction="#goToDashboard" prefHeight="38.0"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Dashboard"/>
+            <Button maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Events"/>
+            <Button maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Participants &amp; Attendance"/>
+            <Button maxWidth="Infinity" onAction="#goToSchedule" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Schedule"/>
+            <Button maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Tasks"/>
+            <Button maxWidth="Infinity" onAction="#goToLeaderboard" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Leaderboard"/>
+            <Button maxWidth="Infinity" onAction="#goToApiEvents" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="API Events"/>
+
+            <VBox VBox.vgrow="ALWAYS"/>
+
+            <Button maxWidth="Infinity" onAction="#handleLogout" prefHeight="38.0"
+                    style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Logout"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20.0">
+            <padding>
+                <Insets bottom="24.0" left="28.0" right="28.0" top="24.0"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="16.0"
+                  style="-fx-background-color: #ffffff; -fx-padding: 16 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                    <Label fx:id="welcomeLabel" text="Welcome to Eventify Dashboard" textFill="#0f172a">
+                        <font>
+                            <Font name="System Bold" size="22.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="accessSummaryLabel" text="Real-time SQLite overview loaded via background ExecutorService tasks" textFill="#64748b">
+                        <font>
+                            <Font size="13.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+                <ProgressIndicator fx:id="loadingIndicator" maxHeight="26.0" maxWidth="26.0" visible="false"/>
+                <Button onAction="#refreshDashboard" prefHeight="36.0"
+                        style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="Refresh Stats"/>
+            </HBox>
+
+            <GridPane hgap="14.0" vgap="14.0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20.0"/>
+                    <ColumnConstraints percentWidth="20.0"/>
+                    <ColumnConstraints percentWidth="20.0"/>
+                    <ColumnConstraints percentWidth="20.0"/>
+                    <ColumnConstraints percentWidth="20.0"/>
+                </columnConstraints>
+
+                <VBox spacing="6.0" GridPane.columnIndex="0"
+                      style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10;">
+                    <Label text="TOTAL EVENTS" textFill="#64748b">
+                        <font>
+                            <Font name="System Bold" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="totalEventsLabel" text="0" textFill="#0f172a">
+                        <font>
+                            <Font name="System Bold" size="30.0"/>
+                        </font>
+                    </Label>
+                    <Label text="All university events" textFill="#94a3b8">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="6.0" GridPane.columnIndex="1"
+                      style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #bae6fd; -fx-border-radius: 10;">
+                    <Label text="UPCOMING EVENTS" textFill="#0284c7">
+                        <font>
+                            <Font name="System Bold" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="upcomingEventsLabel" text="0" textFill="#0369a1">
+                        <font>
+                            <Font name="System Bold" size="30.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Scheduled ahead" textFill="#94a3b8">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="6.0" GridPane.columnIndex="2"
+                      style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #bbf7d0; -fx-border-radius: 10;">
+                    <Label text="ONGOING EVENTS" textFill="#16a34a">
+                        <font>
+                            <Font name="System Bold" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="ongoingEventsLabel" text="0" textFill="#15803d">
+                        <font>
+                            <Font name="System Bold" size="30.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Currently active" textFill="#94a3b8">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="6.0" GridPane.columnIndex="3"
+                      style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #ddd6fe; -fx-border-radius: 10;">
+                    <Label text="TOTAL PARTICIPANTS" textFill="#7c3aed">
+                        <font>
+                            <Font name="System Bold" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="totalParticipantsLabel" text="0" textFill="#6d28d9">
+                        <font>
+                            <Font name="System Bold" size="30.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Registered students" textFill="#94a3b8">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="6.0" GridPane.columnIndex="4"
+                      style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #fed7aa; -fx-border-radius: 10;">
+                    <Label text="PENDING TASKS" textFill="#ea580c">
+                        <font>
+                            <Font name="System Bold" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="pendingTasksLabel" text="0" textFill="#c2410c">
+                        <font>
+                            <Font name="System Bold" size="30.0"/>
+                        </font>
+                    </Label>
+                    <Label text="Awaiting completion" textFill="#94a3b8">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                    </Label>
+                </VBox>
+            </GridPane>
+
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <Label text="University Events Overview" textFill="#0f172a" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Bold" size="16.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="threadStatusLabel" text="" textFill="#0284c7">
+                        <font>
+                            <Font size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+
+                <TableView fx:id="recentEventsTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colId" prefWidth="60.0" text="ID"/>
+                        <TableColumn fx:id="colName" prefWidth="240.0" text="Event Name"/>
+                        <TableColumn fx:id="colCategory" prefWidth="140.0" text="Category"/>
+                        <TableColumn fx:id="colDate" prefWidth="110.0" text="Date"/>
+                        <TableColumn fx:id="colVenue" prefWidth="180.0" text="Venue"/>
+                        <TableColumn fx:id="colOrganizer" prefWidth="150.0" text="Organizer"/>
+                        <TableColumn fx:id="colStatus" prefWidth="110.0" text="Status"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
