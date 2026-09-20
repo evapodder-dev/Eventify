@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="720.0" prefWidth="1180.0"
+            style="-fx-background-color: #f1f5f9;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.eventify.controller.ParticipantController">
+
+    <left>
+        <VBox prefWidth="235.0" spacing="8.0" style="-fx-background-color: #0f172a;">
+            <padding>
+                <Insets bottom="24.0" left="18.0" right="18.0" top="24.0"/>
+            </padding>
+
+            <Label text="EVENTIFY" textFill="#38bdf8">
+                <font>
+                    <Font name="System Bold" size="24.0"/>
+                </font>
+            </Label>
+            <Label text="Participants &amp; Attendance" textFill="#94a3b8">
+                <font>
+                    <Font size="12.0"/>
+                </font>
+                <padding>
+                    <Insets bottom="16.0"/>
+                </padding>
+            </Label>
+
+            <Button maxWidth="Infinity" onAction="#goToDashboard" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Dashboard"/>
+            <Button maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Events"/>
+            <Button maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Participants &amp; Attendance"/>
+            <Button maxWidth="Infinity" onAction="#goToSchedule" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Schedule"/>
+            <Button maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Tasks"/>
+            <Button maxWidth="Infinity" onAction="#goToLeaderboard" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Leaderboard"/>
+            <Button maxWidth="Infinity" onAction="#goToApiEvents" prefHeight="38.0"
+                    style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="API Events"/>
+
+            <VBox VBox.vgrow="ALWAYS"/>
+
+            <Button maxWidth="Infinity" onAction="#handleLogout" prefHeight="38.0"
+                    style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                    text="Logout"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="12.0">
+            <padding>
+                <Insets bottom="16.0" left="20.0" right="20.0" top="16.0"/>
+            </padding>
+
+            <!-- Participant CRUD Section -->
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: #ffffff; -fx-padding: 14 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <Label text="1. Participant Management" textFill="#0f172a" HBox.hgrow="ALWAYS">
+                        <font>
+                            <Font name="System Bold" size="17.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="statusLabel" text="Select a participant to edit or register for an event" textFill="#0284c7">
+                        <font>
+                            <Font size="12.0"/>
+                        </font>
+                    </Label>
+                </HBox>
+
+                <GridPane hgap="10.0" vgap="8.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="20.0"/>
+                        <ColumnConstraints percentWidth="16.0"/>
+                        <ColumnConstraints percentWidth="20.0"/>
+                        <ColumnConstraints percentWidth="16.0"/>
+                        <ColumnConstraints percentWidth="14.0"/>
+                        <ColumnConstraints percentWidth="14.0"/>
+                    </columnConstraints>
+
+                    <VBox spacing="3.0" GridPane.columnIndex="0">
+                        <Label text="Full Name *" textFill="#334155"/>
+                        <TextField fx:id="nameField" promptText="Tanvir Ahmed"/>
+                    </VBox>
+                    <VBox spacing="3.0" GridPane.columnIndex="1">
+                        <Label text="Student ID *" textFill="#334155"/>
+                        <TextField fx:id="studentIdField" promptText="CSE-2023-014"/>
+                    </VBox>
+                    <VBox spacing="3.0" GridPane.columnIndex="2">
+                        <Label text="Email *" textFill="#334155"/>
+                        <TextField fx:id="emailField" promptText="student@uni.edu"/>
+                    </VBox>
+                    <VBox spacing="3.0" GridPane.columnIndex="3">
+                        <Label text="Phone *" textFill="#334155"/>
+                        <TextField fx:id="phoneField" promptText="01711001122"/>
+                    </VBox>
+                    <VBox spacing="3.0" GridPane.columnIndex="4">
+                        <Label text="Department *" textFill="#334155"/>
+                        <ComboBox fx:id="departmentCombo" maxWidth="Infinity" promptText="Dept"/>
+                    </VBox>
+                    <VBox spacing="3.0" GridPane.columnIndex="5">
+                        <Label text="Year *" textFill="#334155"/>
+                        <ComboBox fx:id="yearCombo" maxWidth="Infinity" promptText="Year"/>
+                    </VBox>
+                </GridPane>
+
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Button onAction="#handleAddParticipant"
+                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Add Participant"/>
+                    <Button onAction="#handleUpdateParticipant"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Update Participant"/>
+                    <Button onAction="#handleDeleteParticipant"
+                            style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Delete Participant"/>
+                    <Button onAction="#handleViewRegisteredEvents"
+                            style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="View Registered Events"/>
+                    <Button onAction="#handleClearParticipantForm"
+                            style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Clear"/>
+                    <HBox HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="searchParticipantField" onKeyReleased="#handleSearchParticipants" prefWidth="230.0"
+                               promptText="Search name, ID, dept..."/>
+                </HBox>
+
+                <TableView fx:id="participantsTable" prefHeight="185.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colPartId" prefWidth="55.0" text="ID"/>
+                        <TableColumn fx:id="colPartName" prefWidth="180.0" text="Name"/>
+                        <TableColumn fx:id="colStudentId" prefWidth="130.0" text="Student ID"/>
+                        <TableColumn fx:id="colEmail" prefWidth="200.0" text="Email"/>
+                        <TableColumn fx:id="colPhone" prefWidth="130.0" text="Phone"/>
+                        <TableColumn fx:id="colDepartment" prefWidth="100.0" text="Department"/>
+                        <TableColumn fx:id="colYear" prefWidth="100.0" text="Year"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Registration & Attendance Management Section -->
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: #ffffff; -fx-padding: 14 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                <Label text="2. Event Registration &amp; Attendance Management" textFill="#0f172a">
+                    <font>
+                        <Font name="System Bold" size="17.0"/>
+                    </font>
+                </Label>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <ComboBox fx:id="regParticipantCombo" prefWidth="240.0" promptText="Select Participant"/>
+                    <ComboBox fx:id="regEventCombo" prefWidth="260.0" promptText="Select Event to Register"/>
+                    <Button onAction="#handleRegisterForEvent"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Register for Event"/>
+                    <HBox HBox.hgrow="ALWAYS"/>
+                    <Label text="Mark Selected Attendance:" textFill="#334155">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Button onAction="#handleMarkPresent"
+                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Present"/>
+                    <Button onAction="#handleMarkAbsent"
+                            style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Absent"/>
+                    <Button onAction="#handleMarkNotMarked"
+                            style="-fx-background-color: #64748b; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Not Marked"/>
+                    <Button onAction="#loadRegistrations"
+                            style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Show All"/>
+                </HBox>
+
+                <TableView fx:id="registrationsTable" prefHeight="185.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colRegId" prefWidth="70.0" text="Reg ID"/>
+                        <TableColumn fx:id="colRegParticipant" prefWidth="185.0" text="Participant Name"/>
+                        <TableColumn fx:id="colRegStudentId" prefWidth="130.0" text="Student ID"/>
+                        <TableColumn fx:id="colRegEvent" prefWidth="260.0" text="Event Name"/>
+                        <TableColumn fx:id="colRegDate" prefWidth="120.0" text="Registration Date"/>
+                        <TableColumn fx:id="colRegAttendance" prefWidth="140.0" text="Attendance Status"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
