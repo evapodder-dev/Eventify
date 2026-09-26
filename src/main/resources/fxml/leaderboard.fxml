@@ -75,6 +75,27 @@
             <padding>
                 <Insets bottom="20.0" left="24.0" right="24.0" top="20.0"/>
             </padding>
+            <!-- Page History Navigation Bar (Back / Forward / Breadcrumb / Quick Jump) -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0"
+                  style="-fx-background-color: #e2e8f0; -fx-padding: 8 14; -fx-background-radius: 8;">
+                <Button fx:id="backButton" onAction="#handleGoBack" prefHeight="30.0"
+                        style="-fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="&#8592; Back"/>
+                <Button fx:id="forwardButton" onAction="#handleGoForward" prefHeight="30.0"
+                        style="-fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="Forward &#8594;"/>
+                <Button onAction="#goToDashboard" prefHeight="30.0"
+                        style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="Home (Dashboard)"/>
+                <Label fx:id="breadcrumbLabel" text="Path: [Dashboard]" textFill="#334155" HBox.hgrow="ALWAYS">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                    <padding>
+                        <Insets left="8.0"/>
+                    </padding>
+                </Label>
+            </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 14 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
@@ -152,3 +173,4 @@
         </VBox>
     </center>
 </BorderPane>
+

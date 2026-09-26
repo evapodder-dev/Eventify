@@ -65,6 +65,7 @@ public class DashboardController {
 
     @FXML
     public void initialize() {
+        setupNavigationHeader();
         User currentUser = SessionManager.getCurrentUser();
         if (currentUser != null) {
             userRoleLabel.setText("Signed in: " + currentUser.getRole());
@@ -156,4 +157,49 @@ public class DashboardController {
         SessionManager.clearSession();
         SceneNavigator.navigateTo("login.fxml", "Login");
     }
+
+    @FXML
+    private javafx.scene.control.Button backButton;
+    @FXML
+    private javafx.scene.control.Button forwardButton;
+    @FXML
+    private Label breadcrumbLabel;
+
+    private void setupNavigationHeader() {
+        if (backButton != null) {
+            boolean canBack = SceneNavigator.canGoBack();
+            backButton.setDisable(!canBack);
+            String prev = SceneNavigator.getPreviousPageTitle();
+            backButton.setText(canBack ? ("\u2190 Back (" + prev + ")") : "\u2190 Back");
+        }
+        if (forwardButton != null) {
+            boolean canFwd = SceneNavigator.canGoForward();
+            forwardButton.setDisable(!canFwd);
+            String next = SceneNavigator.getNextPageTitle();
+            forwardButton.setText(canFwd ? ("Forward (" + next + ") \u2192") : "Forward \u2192");
+        }
+        if (breadcrumbLabel != null) {
+            breadcrumbLabel.setText("Navigation Path:  " + SceneNavigator.getBreadcrumbTrail());
+        }
+    }
+
+    @FXML
+    private void handleGoBack() {
+        SceneNavigator.goBack();
+    }
+
+    @FXML
+    private void handleGoForward() {
+        SceneNavigator.goForward();
+    }
+
+    @FXML
+    private void handleJumpToSelectedEventSchedule() {
+        Event selected = recentEventsTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            SceneNavigator.setContextEventId(selected.getEventId());
+        }
+        SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
+    }
 }
+

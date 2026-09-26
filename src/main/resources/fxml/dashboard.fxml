@@ -74,6 +74,27 @@
             <padding>
                 <Insets bottom="24.0" left="28.0" right="28.0" top="24.0"/>
             </padding>
+            <!-- Page History Navigation Bar (Back / Forward / Breadcrumb / Quick Jump) -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0"
+                  style="-fx-background-color: #e2e8f0; -fx-padding: 8 14; -fx-background-radius: 8;">
+                <Button fx:id="backButton" onAction="#handleGoBack" prefHeight="30.0"
+                        style="-fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="&#8592; Back"/>
+                <Button fx:id="forwardButton" onAction="#handleGoForward" prefHeight="30.0"
+                        style="-fx-background-color: #0f172a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="Forward &#8594;"/>
+                <Button onAction="#goToDashboard" prefHeight="30.0"
+                        style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 12; -fx-background-radius: 6; -fx-cursor: hand;"
+                        text="Home (Dashboard)"/>
+                <Label fx:id="breadcrumbLabel" text="Path: [Dashboard]" textFill="#334155" HBox.hgrow="ALWAYS">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                    <padding>
+                        <Insets left="8.0"/>
+                    </padding>
+                </Label>
+            </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="16.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
@@ -215,6 +236,28 @@
                     </Label>
                 </HBox>
 
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Label text="Quick Navigate:" textFill="#475569">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <Button onAction="#goToEvents"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Manage Events &#8594;"/>
+                    <Button onAction="#handleJumpToSelectedEventSchedule"
+                            style="-fx-background-color: #0f766e; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="View Selected Event Schedule &#8594;"/>
+                    <Button onAction="#goToParticipants"
+                            style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Participants &amp; Attendance &#8594;"/>
+                    <Button onAction="#goToTasks"
+                            style="-fx-background-color: #ea580c; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Pending Tasks &#8594;"/>
+                    <Button onAction="#goToLeaderboard"
+                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Leaderboard &#8594;"/>
+                </HBox>
                 <TableView fx:id="recentEventsTable" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colId" prefWidth="60.0" text="ID"/>
@@ -230,3 +273,5 @@
         </VBox>
     </center>
 </BorderPane>
+
+

@@ -87,6 +87,7 @@ public class EventController {
 
     @FXML
     public void initialize() {
+        setupNavigationHeader();
         categoryCombo.setItems(FXCollections.observableArrayList(
                 "Workshop", "Programming Contest", "Seminar", "Competition", "Club Program", "Cultural Event"
         ));
@@ -442,4 +443,56 @@ public class EventController {
         SessionManager.clearSession();
         SceneNavigator.navigateTo("login.fxml", "Login");
     }
+
+    @FXML
+    private javafx.scene.control.Button backButton;
+    @FXML
+    private javafx.scene.control.Button forwardButton;
+    @FXML
+    private Label breadcrumbLabel;
+
+    private void setupNavigationHeader() {
+        if (backButton != null) {
+            boolean canBack = SceneNavigator.canGoBack();
+            backButton.setDisable(!canBack);
+            String prev = SceneNavigator.getPreviousPageTitle();
+            backButton.setText(canBack ? ("\u2190 Back (" + prev + ")") : "\u2190 Back");
+        }
+        if (forwardButton != null) {
+            boolean canFwd = SceneNavigator.canGoForward();
+            forwardButton.setDisable(!canFwd);
+            String next = SceneNavigator.getNextPageTitle();
+            forwardButton.setText(canFwd ? ("Forward (" + next + ") \u2192") : "Forward \u2192");
+        }
+        if (breadcrumbLabel != null) {
+            breadcrumbLabel.setText("Navigation Path:  " + SceneNavigator.getBreadcrumbTrail());
+        }
+    }
+
+    @FXML
+    private void handleGoBack() {
+        SceneNavigator.goBack();
+    }
+
+    @FXML
+    private void handleGoForward() {
+        SceneNavigator.goForward();
+    }
+
+    @FXML
+    private void handleOpenEventSchedule() {
+        if (selectedEvent != null) {
+            SceneNavigator.setContextEventId(selectedEvent.getEventId());
+        }
+        SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
+    }
+
+    @FXML
+    private void handleOpenEventLeaderboard() {
+        if (selectedEvent != null) {
+            SceneNavigator.setContextEventId(selectedEvent.getEventId());
+        }
+        SceneNavigator.navigateTo("leaderboard.fxml", "Leaderboard & Results");
+    }
 }
+

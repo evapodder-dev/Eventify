@@ -68,6 +68,7 @@ public class ScheduleController {
 
     @FXML
     public void initialize() {
+        setupNavigationHeader();
         colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getScheduleId()));
         colEvent.setCellValueFactory(c -> new SimpleStringProperty("#" + c.getValue().getEventId() + " - " + c.getValue().getEventName()));
         colActivity.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getActivityName()));
@@ -120,6 +121,16 @@ public class ScheduleController {
                 filterEventCombo.setItems(FXCollections.observableArrayList(events));
                 scheduleTable.setItems(FXCollections.observableArrayList(schedules));
                 statusLabel.setText("Loaded " + schedules.size() + " schedule item(s).");
+                Integer contextId = SceneNavigator.consumeContextEventId();
+                if (contextId != null) {
+                    for (Event ev : events) {
+                        if (ev.getEventId() == contextId) {
+                            filterEventCombo.setValue(ev);
+                            handleFilterByEvent();
+                            break;
+                        }
+                    }
+                }
             }
         };
         AppExecutor.getExecutor().submit(task);
@@ -288,4 +299,41 @@ public class ScheduleController {
         SessionManager.clearSession();
         SceneNavigator.navigateTo("login.fxml", "Login");
     }
+
+    @FXML
+    private javafx.scene.control.Button backButton;
+    @FXML
+    private javafx.scene.control.Button forwardButton;
+    @FXML
+    private Label breadcrumbLabel;
+
+    private void setupNavigationHeader() {
+        if (backButton != null) {
+            boolean canBack = SceneNavigator.canGoBack();
+            backButton.setDisable(!canBack);
+            String prev = SceneNavigator.getPreviousPageTitle();
+            backButton.setText(canBack ? ("\u2190 Back (" + prev + ")") : "\u2190 Back");
+        }
+        if (forwardButton != null) {
+            boolean canFwd = SceneNavigator.canGoForward();
+            forwardButton.setDisable(!canFwd);
+            String next = SceneNavigator.getNextPageTitle();
+            forwardButton.setText(canFwd ? ("Forward (" + next + ") \u2192") : "Forward \u2192");
+        }
+        if (breadcrumbLabel != null) {
+            breadcrumbLabel.setText("Navigation Path:  " + SceneNavigator.getBreadcrumbTrail());
+        }
+    }
+
+    @FXML
+    private void handleGoBack() {
+        SceneNavigator.goBack();
+    }
+
+    @FXML
+    private void handleGoForward() {
+        SceneNavigator.goForward();
+    }
 }
+
+

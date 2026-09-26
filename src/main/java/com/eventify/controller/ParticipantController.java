@@ -88,6 +88,7 @@ public class ParticipantController {
 
     @FXML
     public void initialize() {
+        setupNavigationHeader();
         departmentCombo.setItems(FXCollections.observableArrayList("CSE", "EEE", "SWE", "ME", "CE", "BBA"));
         yearCombo.setItems(FXCollections.observableArrayList("1st Year", "2nd Year", "3rd Year", "4th Year"));
 
@@ -399,4 +400,40 @@ public class ParticipantController {
         SessionManager.clearSession();
         SceneNavigator.navigateTo("login.fxml", "Login");
     }
+
+    @FXML
+    private javafx.scene.control.Button backButton;
+    @FXML
+    private javafx.scene.control.Button forwardButton;
+    @FXML
+    private Label breadcrumbLabel;
+
+    private void setupNavigationHeader() {
+        if (backButton != null) {
+            boolean canBack = SceneNavigator.canGoBack();
+            backButton.setDisable(!canBack);
+            String prev = SceneNavigator.getPreviousPageTitle();
+            backButton.setText(canBack ? ("\u2190 Back (" + prev + ")") : "\u2190 Back");
+        }
+        if (forwardButton != null) {
+            boolean canFwd = SceneNavigator.canGoForward();
+            forwardButton.setDisable(!canFwd);
+            String next = SceneNavigator.getNextPageTitle();
+            forwardButton.setText(canFwd ? ("Forward (" + next + ") \u2192") : "Forward \u2192");
+        }
+        if (breadcrumbLabel != null) {
+            breadcrumbLabel.setText("Navigation Path:  " + SceneNavigator.getBreadcrumbTrail());
+        }
+    }
+
+    @FXML
+    private void handleGoBack() {
+        SceneNavigator.goBack();
+    }
+
+    @FXML
+    private void handleGoForward() {
+        SceneNavigator.goForward();
+    }
 }
+
