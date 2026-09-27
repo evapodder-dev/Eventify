@@ -169,7 +169,7 @@
 
                     <VBox spacing="4.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
                         <Label text="Organizer *" textFill="#334155"/>
-                        <TextField fx:id="organizerField" promptText="e.g., CSE Club"/>
+                        <TextField fx:id="organizerField" promptText="e.g., EVA PODDER"/>
                     </VBox>
 
                     <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">

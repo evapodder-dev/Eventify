@@ -147,6 +147,10 @@ public class DatabaseInitializer {
                 if (!hasDesc) {
                     s.execute("ALTER TABLE events ADD COLUMN description TEXT DEFAULT ''");
                 }
+                
+                // User requested to change Organizer name to EVA PODDER
+                s.execute("UPDATE users SET name = 'EVA PODDER' WHERE username = 'admin'");
+                s.execute("UPDATE events SET organizer = 'EVA PODDER'");
             }
 
             seedInitialData(conn);
@@ -165,8 +169,8 @@ public class DatabaseInitializer {
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, "admin");
                     ps.setString(2, "admin123");
-                    ps.setString(3, "Dr. Ayesha Rahman (Organizer)");
-                    ps.setString(4, "organizer@university.edu");
+                    ps.setString(3, "EVA PODDER");
+                    ps.setString(4, "evapodder@university.edu");
                     ps.setString(5, "Organizer");
                     ps.executeUpdate();
 
@@ -196,7 +200,7 @@ public class DatabaseInitializer {
                     ps.setString(5, "09:00");
                     ps.setString(6, "14:00");
                     ps.setString(7, "CSE Lab Complex 301");
-                    ps.setString(8, "CSE Computer Club");
+                    ps.setString(8, "EVA PODDER");
                     ps.setInt(9, 120);
                     ps.setString(10, "Upcoming");
                     ps.executeUpdate();
@@ -208,7 +212,7 @@ public class DatabaseInitializer {
                     ps.setString(5, "10:00");
                     ps.setString(6, "13:00");
                     ps.setString(7, "Software Engineering Lab 204");
-                    ps.setString(8, "Department of CSE");
+                    ps.setString(8, "EVA PODDER");
                     ps.setInt(9, 60);
                     ps.setString(10, "Ongoing");
                     ps.executeUpdate();
@@ -220,7 +224,7 @@ public class DatabaseInitializer {
                     ps.setString(5, "15:00");
                     ps.setString(6, "17:30");
                     ps.setString(7, "Central Auditorium");
-                    ps.setString(8, "IEEE Student Branch");
+                    ps.setString(8, "EVA PODDER");
                     ps.setInt(9, 250);
                     ps.setString(10, "Completed");
                     ps.executeUpdate();
