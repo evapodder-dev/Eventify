@@ -164,6 +164,9 @@
                     <Button onAction="#handleDeleteSchedule" prefHeight="34.0"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Schedule"/>
+                    <Button onAction="#handleViewDetails" prefHeight="34.0"
+                            style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="View Schedule Details"/>
                     <Button onAction="#handleClearForm" prefHeight="34.0"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>

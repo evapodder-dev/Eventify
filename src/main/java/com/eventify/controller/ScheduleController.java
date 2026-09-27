@@ -232,6 +232,34 @@ public class ScheduleController {
     }
 
     @FXML
+    private void handleViewDetails() {
+        if (selectedSchedule == null) {
+            showError("No Selection", "Select a schedule entry from the table to view its full details.");
+            return;
+        }
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setTitle("Schedule Details - #" + selectedSchedule.getScheduleId());
+        info.setHeaderText("Activity: " + selectedSchedule.getActivityName());
+        String details = String.format("""
+                Schedule ID: %d
+                Event: %s
+                Date: %s
+                Time: %s - %s
+                Venue: %s
+                """,
+                selectedSchedule.getScheduleId(),
+                selectedSchedule.getEventName(),
+                selectedSchedule.getDate(),
+                selectedSchedule.getStartTime(),
+                selectedSchedule.getEndTime(),
+                selectedSchedule.getVenue()
+        );
+        info.setContentText(details);
+        info.showAndWait();
+    }
+
+
+    @FXML
     public void handleClearForm() {
         selectedSchedule = null;
         scheduleTable.getSelectionModel().clearSelection();

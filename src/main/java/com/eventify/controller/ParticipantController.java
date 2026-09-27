@@ -225,6 +225,35 @@ public class ParticipantController {
     }
 
     @FXML
+    private void handleViewDetails() {
+        if (selectedParticipant == null) {
+            showError("No Selection", "Select a participant from the table to view details.");
+            return;
+        }
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setTitle("Participant Details - #" + selectedParticipant.getParticipantId());
+        info.setHeaderText("Name: " + selectedParticipant.getName());
+        String details = String.format("""
+                Participant ID: %d
+                Student ID: %s
+                Email: %s
+                Phone: %s
+                Department: %s
+                Year: %s
+                """,
+                selectedParticipant.getParticipantId(),
+                selectedParticipant.getStudentId(),
+                selectedParticipant.getEmail(),
+                selectedParticipant.getPhone(),
+                selectedParticipant.getDepartment(),
+                selectedParticipant.getYear()
+        );
+        info.setContentText(details);
+        info.showAndWait();
+    }
+
+
+    @FXML
     private void handleSearchParticipants() {
         String keyword = searchParticipantField.getText();
         Task<List<Participant>> task = new Task<>() {

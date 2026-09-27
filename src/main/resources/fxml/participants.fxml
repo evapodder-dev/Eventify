@@ -159,6 +159,9 @@
                     <Button onAction="#handleDeleteParticipant"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Participant"/>
+                    <Button onAction="#handleViewDetails"
+                            style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="View Details"/>
                     <Button onAction="#handleViewRegisteredEvents"
                             style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Registered Events"/>
