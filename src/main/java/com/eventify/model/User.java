@@ -1,10 +1,11 @@
 package com.eventify.model;
 
 /**
- * Base class representing an authenticated Eventify system user.
- * Demonstrates encapsulation, constructors, inheritance, and polymorphism.
+ * Abstract base class representing an authenticated Eventify system user.
+ * Demonstrates: Abstract classes, abstract methods, encapsulation, constructors,
+ * polymorphism (subclass override), and the Template Method pattern.
  */
-public class User {
+public abstract class User {
 
     private int userId;
     private String username;
@@ -13,10 +14,10 @@ public class User {
     private String email;
     private String role;
 
-    public User() {
+    protected User() {
     }
 
-    public User(int userId, String username, String password, String fullName, String email, String role) {
+    protected User(int userId, String username, String password, String fullName, String email, String role) {
         this.userId = userId;
         this.username = username;
         this.password = password;
@@ -25,13 +26,27 @@ public class User {
         this.role = role;
     }
 
-    public String getAccessSummary() {
-        return "Standard Eventify User";
+    /**
+     * Abstract method — each subclass must define its own access summary.
+     * This is the key demonstration of abstract methods for APL.
+     */
+    public abstract String getAccessSummary();
+
+    /**
+     * Abstract method — determines if this user type can manage the system.
+     */
+    public abstract boolean canManageSystem();
+
+    /**
+     * Template method pattern: returns a formatted display string.
+     * Subclasses customize via getAccessSummary() and canManageSystem().
+     */
+    public final String getDisplayInfo() {
+        return String.format("[%s] %s — %s (Admin: %s)",
+                role, fullName, getAccessSummary(), canManageSystem() ? "Yes" : "No");
     }
 
-    public boolean canManageSystem() {
-        return "Organizer".equalsIgnoreCase(role);
-    }
+    // --- Getters and Setters (Encapsulation) ---
 
     public int getUserId() {
         return userId;

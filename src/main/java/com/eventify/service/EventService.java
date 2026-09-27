@@ -1,5 +1,6 @@
 package com.eventify.service;
 
+import com.eventify.dao.CrudDAO;
 import com.eventify.dao.EventDAO;
 import com.eventify.model.Event;
 
@@ -7,12 +8,20 @@ import java.util.List;
 
 /**
  * Service layer for validating and managing University Events.
+ * Extends the abstract BaseService to inherit template CRUD methods,
+ * and overrides the validate method with Event-specific business rules.
  */
-public class EventService {
+public class EventService extends BaseService<Event, Integer> {
 
     private final EventDAO eventDAO = new EventDAO();
 
-    public void validateEvent(Event event) {
+    @Override
+    protected CrudDAO<Event, Integer> getDao() {
+        return eventDAO;
+    }
+
+    @Override
+    protected void validate(Event event) {
         if (event.getEventName() == null || event.getEventName().isBlank()) {
             throw new IllegalArgumentException("Event Name is required.");
         }
@@ -42,25 +51,28 @@ public class EventService {
         }
     }
 
+    // Keep backward-compatible methods used by controllers
+    public void validateEvent(Event event) {
+        validate(event);
+    }
+
     public boolean createEvent(Event event) {
-        validateEvent(event);
-        return eventDAO.insert(event);
+        return create(event);
     }
 
     public boolean updateEvent(Event event) {
         if (event.getEventId() <= 0) {
             throw new IllegalArgumentException("Please select an existing event to update.");
         }
-        validateEvent(event);
-        return eventDAO.update(event);
+        return update(event);
     }
 
     public boolean deleteEvent(int eventId) {
-        return eventDAO.delete(eventId);
+        return delete(eventId);
     }
 
     public List<Event> getAllEvents() {
-        return eventDAO.findAll();
+        return getAll();
     }
 
     public List<Event> searchEvents(String keyword, String status) {

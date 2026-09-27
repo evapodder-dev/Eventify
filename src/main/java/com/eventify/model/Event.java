@@ -1,9 +1,14 @@
 package com.eventify.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Represents a University Event in Eventify.
+ * Demonstrates: Implementing multiple interfaces (Searchable, Exportable),
+ * Comparable interface for natural ordering, and Enum usage.
  */
-public class Event {
+public class Event implements Searchable, Exportable, Comparable<Event> {
 
     private int eventId;
     private String eventName;
@@ -42,6 +47,59 @@ public class Event {
         this(0, eventName, description, category, date, startTime, endTime, venue, organizer, maxParticipants, status);
     }
 
+    // --- Searchable Interface Implementation ---
+    @Override
+    public boolean matchesKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank()) return true;
+        String lower = keyword.toLowerCase();
+        return (eventName != null && eventName.toLowerCase().contains(lower))
+                || (category != null && category.toLowerCase().contains(lower))
+                || (venue != null && venue.toLowerCase().contains(lower))
+                || (organizer != null && organizer.toLowerCase().contains(lower));
+    }
+
+    @Override
+    public String getSearchLabel() {
+        return "#" + eventId + " " + eventName + " [" + category + "]";
+    }
+
+    // --- Exportable Interface Implementation ---
+    @Override
+    public Map<String, Object> toExportMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("eventName", eventName);
+        map.put("category", category);
+        map.put("date", date);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("venue", venue);
+        map.put("organizer", organizer);
+        map.put("maxParticipants", maxParticipants);
+        map.put("status", status);
+        map.put("description", description);
+        return map;
+    }
+
+    @Override
+    public String toExportSummary() {
+        return String.format("%s | %s | %s | %s | %s", eventName, category, date, venue, status);
+    }
+
+    // --- Comparable Interface Implementation ---
+    @Override
+    public int compareTo(Event other) {
+        if (this.date == null && other.date == null) return 0;
+        if (this.date == null) return 1;
+        if (other.date == null) return -1;
+        return this.date.compareTo(other.date);
+    }
+
+    // --- Enum convenience ---
+    public EventStatus getEventStatus() {
+        return EventStatus.fromString(status);
+    }
+
+    // --- Getters and Setters ---
     public int getEventId() {
         return eventId;
     }
