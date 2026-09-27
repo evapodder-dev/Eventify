@@ -147,13 +147,15 @@ public class DatabaseInitializer {
                 if (!hasDesc) {
                     s.execute("ALTER TABLE events ADD COLUMN description TEXT DEFAULT ''");
                 }
-                
-                // User requested to change Organizer name to EVA PODDER
-                s.execute("UPDATE users SET name = 'EVA PODDER' WHERE username = 'admin'");
-                s.execute("UPDATE events SET organizer = 'EVA PODDER'");
             }
 
             seedInitialData(conn);
+
+            // Ensure Organizer name is set to EVA PODDER in existing databases
+            try (Statement s = conn.createStatement()) {
+                s.execute("UPDATE users SET full_name = 'EVA PODDER', email = 'evapodder@university.edu' WHERE username = 'admin'");
+                s.execute("UPDATE events SET organizer = 'EVA PODDER' WHERE organizer IN ('CSE Computer Club', 'Department of CSE', 'IEEE Student Branch')");
+            }
 
         } catch (SQLException e) {
             throw new DatabaseException("Failed to initialize SQLite database schema: " + e.getMessage(), e);

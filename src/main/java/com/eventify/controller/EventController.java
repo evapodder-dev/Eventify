@@ -94,6 +94,7 @@ public class EventController {
         ));
         statusCombo.setItems(FXCollections.observableArrayList("Upcoming", "Ongoing", "Completed"));
         statusCombo.setValue("Upcoming");
+        organizerField.setText("EVA PODDER");
 
         filterStatusCombo.setItems(FXCollections.observableArrayList("All", "Upcoming", "Ongoing", "Completed"));
         filterStatusCombo.setValue("All");
@@ -357,7 +358,7 @@ public class EventController {
         startTimeField.clear();
         endTimeField.clear();
         venueField.clear();
-        organizerField.clear();
+        organizerField.setText("EVA PODDER");
         maxParticipantsField.clear();
         descriptionField.clear();
     }
