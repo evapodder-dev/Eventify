@@ -134,6 +134,21 @@ public class DatabaseInitializer {
                 );
                 """);
 
+            // Apply schema migrations if necessary
+            try (Statement s = conn.createStatement();
+                 ResultSet rs = s.executeQuery("PRAGMA table_info(events)")) {
+                boolean hasDesc = false;
+                while (rs.next()) {
+                    if ("description".equals(rs.getString("name"))) {
+                        hasDesc = true;
+                        break;
+                    }
+                }
+                if (!hasDesc) {
+                    s.execute("ALTER TABLE events ADD COLUMN description TEXT DEFAULT ''");
+                }
+            }
+
             seedInitialData(conn);
 
         } catch (SQLException e) {
