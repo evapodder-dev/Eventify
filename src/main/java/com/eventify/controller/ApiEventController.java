@@ -6,6 +6,7 @@ import com.eventify.service.ApiEventService;
 import com.eventify.service.ApiEventService.ApiFetchResult;
 import com.eventify.service.EventService;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -261,4 +262,5 @@ public class ApiEventController {
         SceneNavigator.goForward();
     }
 }
+
 

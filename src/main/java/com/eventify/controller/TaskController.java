@@ -5,6 +5,7 @@ import com.eventify.dao.TaskDAO;
 import com.eventify.model.Event;
 import com.eventify.model.Task;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -108,6 +109,11 @@ public class TaskController {
                 }
             }
         });
+
+                // Responsive: bind task table columns to table width
+        if (tasksTable != null && tasksTable.getColumns().size() >= 6) {
+            ResponsiveHelper.bindColumnWidths(tasksTable, 0.06, 0.18, 0.18, 0.14, 0.12, 0.12, 0.10);
+        }
 
         loadTasks();
     }
@@ -357,4 +363,5 @@ public class TaskController {
         SceneNavigator.goForward();
     }
 }
+
 

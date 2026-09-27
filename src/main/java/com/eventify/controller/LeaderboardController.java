@@ -7,6 +7,7 @@ import com.eventify.model.Event;
 import com.eventify.model.Participant;
 import com.eventify.model.Result;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -88,6 +89,11 @@ public class LeaderboardController {
                 }
             }
         });
+
+        // Responsive: bind leaderboard table columns to table width
+        if (leaderboardTable != null && leaderboardTable.getColumns().size() >= 5) {
+            ResponsiveHelper.bindColumnWidths(leaderboardTable, 0.08, 0.22, 0.20, 0.15, 0.22, 0.08);
+        }
 
         loadResults();
     }
@@ -296,5 +302,6 @@ public class LeaderboardController {
         SceneNavigator.goForward();
     }
 }
+
 
 

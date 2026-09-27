@@ -260,18 +260,19 @@
                 </HBox>
                 <TableView fx:id="recentEventsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="60.0" text="ID"/>
-                        <TableColumn fx:id="colName" prefWidth="240.0" text="Event Name"/>
-                        <TableColumn fx:id="colCategory" prefWidth="140.0" text="Category"/>
-                        <TableColumn fx:id="colDate" prefWidth="110.0" text="Date"/>
-                        <TableColumn fx:id="colVenue" prefWidth="180.0" text="Venue"/>
-                        <TableColumn fx:id="colOrganizer" prefWidth="150.0" text="Organizer"/>
-                        <TableColumn fx:id="colStatus" prefWidth="110.0" text="Status"/>
+                        <TableColumn fx:id="colId" text="ID"/>
+                        <TableColumn fx:id="colName" text="Event Name"/>
+                        <TableColumn fx:id="colCategory" text="Category"/>
+                        <TableColumn fx:id="colDate" text="Date"/>
+                        <TableColumn fx:id="colVenue" text="Venue"/>
+                        <TableColumn fx:id="colOrganizer" text="Organizer"/>
+                        <TableColumn fx:id="colStatus" text="Status"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
+
 
 

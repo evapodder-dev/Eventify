@@ -5,6 +5,7 @@ import com.eventify.model.User;
 import com.eventify.service.DashboardService;
 import com.eventify.service.DashboardService.DashboardSummary;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -81,7 +82,11 @@ public class DashboardController {
         colOrganizer.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getOrganizer()));
         colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
 
-        refreshDashboard();
+        
+        // Responsive layout: bind table column widths to percentage of table width
+        ResponsiveHelper.bindColumnWidths(recentEventsTable,
+                0.06, 0.25, 0.15, 0.12, 0.18, 0.14, 0.10);
+refreshDashboard();
     }
 
     @FXML
@@ -202,4 +207,5 @@ public class DashboardController {
         SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
     }
 }
+
 

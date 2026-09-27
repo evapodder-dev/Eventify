@@ -5,6 +5,7 @@ import com.eventify.dao.ScheduleDAO;
 import com.eventify.model.Event;
 import com.eventify.model.Schedule;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -97,6 +98,11 @@ public class ScheduleController {
                 }
             }
         });
+
+                // Responsive: bind schedule table columns to table width
+        if (scheduleTable != null && scheduleTable.getColumns().size() >= 5) {
+            ResponsiveHelper.bindColumnWidths(scheduleTable, 0.08, 0.25, 0.25, 0.20, 0.22);
+        }
 
         loadSchedules();
     }
@@ -335,5 +341,6 @@ public class ScheduleController {
         SceneNavigator.goForward();
     }
 }
+
 
 

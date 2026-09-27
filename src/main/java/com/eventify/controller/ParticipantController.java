@@ -7,6 +7,7 @@ import com.eventify.model.Event;
 import com.eventify.model.Participant;
 import com.eventify.model.Registration;
 import com.eventify.util.AppExecutor;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -119,6 +120,10 @@ public class ParticipantController {
                 regParticipantCombo.setValue(newV);
             }
         });
+
+        // Responsive: bind participant and registration table columns to table width
+        ResponsiveHelper.bindColumnWidths(participantsTable, 0.06, 0.16, 0.12, 0.18, 0.14, 0.18, 0.10);
+        ResponsiveHelper.bindColumnWidths(registrationsTable, 0.08, 0.20, 0.14, 0.22, 0.18, 0.14);
 
         loadAllData();
     }
@@ -436,4 +441,5 @@ public class ParticipantController {
         SceneNavigator.goForward();
     }
 }
+
 

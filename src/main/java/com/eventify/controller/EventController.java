@@ -4,6 +4,7 @@ import com.eventify.model.Event;
 import com.eventify.service.EventService;
 import com.eventify.util.AppExecutor;
 import com.eventify.util.JsonUtil;
+import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -107,6 +108,13 @@ public class EventController {
         colOrganizer.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getOrganizer()));
         colMax.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getMaxParticipants()));
         colStatus.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
+
+        // Responsive: bind columns to percentages of table width
+        ResponsiveHelper.bindColumnWidths(eventsTable,
+                0.05, 0.18, 0.12, 0.10, 0.08, 0.08, 0.13, 0.12, 0.06, 0.08);
+
+        // Make search field responsive — stretch to fill available space
+        searchField.maxWidthProperty().bind(eventsTable.widthProperty().multiply(0.4));
 
         eventsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
@@ -495,4 +503,5 @@ public class EventController {
         SceneNavigator.navigateTo("leaderboard.fxml", "Leaderboard & Results");
     }
 }
+
 

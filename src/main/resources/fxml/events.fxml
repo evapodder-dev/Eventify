@@ -212,7 +212,7 @@
             <VBox spacing="10.0" VBox.vgrow="ALWAYS"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <TextField fx:id="searchField" onKeyReleased="#handleSearch" prefWidth="320.0"
+                    <TextField fx:id="searchField" onKeyReleased="#handleSearch" HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                promptText="Search by name, category, venue, or organizer..."/>
                     <ComboBox fx:id="filterStatusCombo" onAction="#handleSearch" prefWidth="160.0"
                               promptText="Filter by Status"/>
@@ -226,21 +226,22 @@
 
                 <TableView fx:id="eventsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="55.0" text="ID"/>
-                        <TableColumn fx:id="colName" prefWidth="195.0" text="Event Name"/>
-                        <TableColumn fx:id="colCategory" prefWidth="130.0" text="Category"/>
-                        <TableColumn fx:id="colDate" prefWidth="95.0" text="Date"/>
-                        <TableColumn fx:id="colStart" prefWidth="75.0" text="Start"/>
-                        <TableColumn fx:id="colEnd" prefWidth="75.0" text="End"/>
-                        <TableColumn fx:id="colVenue" prefWidth="135.0" text="Venue"/>
-                        <TableColumn fx:id="colOrganizer" prefWidth="120.0" text="Organizer"/>
-                        <TableColumn fx:id="colMax" prefWidth="65.0" text="Max"/>
-                        <TableColumn fx:id="colStatus" prefWidth="95.0" text="Status"/>
+                        <TableColumn fx:id="colId" text="ID"/>
+                        <TableColumn fx:id="colName" text="Event Name"/>
+                        <TableColumn fx:id="colCategory" text="Category"/>
+                        <TableColumn fx:id="colDate" text="Date"/>
+                        <TableColumn fx:id="colStart" text="Start"/>
+                        <TableColumn fx:id="colEnd" text="End"/>
+                        <TableColumn fx:id="colVenue" text="Venue"/>
+                        <TableColumn fx:id="colOrganizer" text="Organizer"/>
+                        <TableColumn fx:id="colMax" text="Max"/>
+                        <TableColumn fx:id="colStatus" text="Status"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
+
 
 
