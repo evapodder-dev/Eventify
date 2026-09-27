@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
 import java.util.List;
 
 /**
- * Controller for leaderboard.fxml managing participant scores and sorted rankings.
+ * Controller for leaderboard.fxml managing participant scores and dynamic/custom rankings.
  */
 public class LeaderboardController {
 
@@ -36,6 +36,8 @@ public class LeaderboardController {
     private ComboBox<Participant> participantCombo;
     @FXML
     private TextField scoreField;
+    @FXML
+    private TextField rankField;
     @FXML
     private ComboBox<Event> filterEventCombo;
     @FXML
@@ -75,6 +77,9 @@ public class LeaderboardController {
             if (newV != null) {
                 selectedResult = newV;
                 scoreField.setText(String.valueOf(newV.getScore()));
+                if (rankField != null) {
+                    rankField.setText(String.valueOf(newV.getRank()));
+                }
                 for (Event ev : eventCombo.getItems()) {
                     if (ev.getEventId() == newV.getEventId()) {
                         eventCombo.setValue(ev);
@@ -120,7 +125,7 @@ public class LeaderboardController {
                 filterEventCombo.setItems(FXCollections.observableArrayList(events));
                 participantCombo.setItems(FXCollections.observableArrayList(participants));
                 leaderboardTable.setItems(FXCollections.observableArrayList(results));
-                statusLabel.setText("Loaded " + results.size() + " leaderboard result(s) sorted by score descending.");
+                statusLabel.setText("Loaded " + results.size() + " leaderboard result(s).");
                 Integer contextId = SceneNavigator.consumeContextEventId();
                 if (contextId != null) {
                     for (Event ev : events) {
@@ -155,6 +160,48 @@ public class LeaderboardController {
         AppExecutor.getExecutor().submit(task);
     }
 
+    private int parseCustomRankForAdd() {
+        if (rankField == null || rankField.getText() == null || rankField.getText().trim().isEmpty()) {
+            return 0; // auto-calculate by score
+        }
+        String raw = rankField.getText().trim();
+        try {
+            int parsed = Integer.parseInt(raw);
+            if (parsed <= 0) {
+                throw new IllegalArgumentException("Rank must be a positive integer (1, 2, 3...) or left empty for auto-ranking.");
+            }
+            // If a row was selected and the user did not change the rank text when adding a different entry, auto-rank it
+            if (selectedResult != null && parsed == selectedResult.getRank()) {
+                return 0;
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Rank must be a valid integer or left empty for auto-ranking.");
+        }
+    }
+
+    private int parseCustomRankForUpdate(double newScore) {
+        if (rankField == null || rankField.getText() == null || rankField.getText().trim().isEmpty()) {
+            return 0; // auto-calculate by score
+        }
+        String raw = rankField.getText().trim();
+        try {
+            int parsed = Integer.parseInt(raw);
+            if (parsed <= 0) {
+                throw new IllegalArgumentException("Rank must be a positive integer (1, 2, 3...) or left empty for auto-ranking.");
+            }
+            // If the user changed the score but kept the old rank text untouched, auto-recalculate the rank based on the new score
+            if (selectedResult != null
+                    && parsed == selectedResult.getRank()
+                    && Double.compare(newScore, selectedResult.getScore()) != 0) {
+                return 0;
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Rank must be a valid integer or left empty for auto-ranking.");
+        }
+    }
+
     @FXML
     private void handleSaveResult() {
         Event ev = eventCombo.getValue();
@@ -170,8 +217,15 @@ public class LeaderboardController {
             showError("Validation Error", "Score must be a valid number.");
             return;
         }
+        int rankToUse;
+        try {
+            rankToUse = parseCustomRankForAdd();
+        } catch (IllegalArgumentException ex) {
+            showError("Validation Error", ex.getMessage());
+            return;
+        }
 
-        Result r = new Result(0, ev.getEventId(), ev.getEventName(), p.getParticipantId(), p.getName(), p.getStudentId(), score, 1);
+        Result r = new Result(0, ev.getEventId(), ev.getEventName(), p.getParticipantId(), p.getName(), p.getStudentId(), score, rankToUse);
         Task<Boolean> task = new Task<>() {
             @Override
             protected Boolean call() {
@@ -181,9 +235,61 @@ public class LeaderboardController {
         task.setOnSucceeded(e -> {
             handleClearForm();
             loadResults();
-            statusLabel.setText("Score saved and ranks recalculated.");
+            statusLabel.setText(rankToUse > 0 ? "Result added with custom Rank #" + rankToUse + "." : "Score saved and ranks recalculated.");
         });
         task.setOnFailed(e -> showError("Save Result Error", task.getException().getMessage()));
+        AppExecutor.getExecutor().submit(task);
+    }
+
+    @FXML
+    private void handleUpdateResult() {
+        if (selectedResult == null) {
+            showError("No Selection", "Please select a result row from the leaderboard to update.");
+            return;
+        }
+        Event ev = eventCombo.getValue();
+        Participant p = participantCombo.getValue();
+        if (ev == null || p == null) {
+            showError("Validation Error", "Please select both an Event and a Participant.");
+            return;
+        }
+        double score;
+        try {
+            score = Double.parseDouble(scoreField.getText().trim());
+        } catch (Exception e) {
+            showError("Validation Error", "Score must be a valid number.");
+            return;
+        }
+        int rankToUse;
+        try {
+            rankToUse = parseCustomRankForUpdate(score);
+        } catch (IllegalArgumentException ex) {
+            showError("Validation Error", ex.getMessage());
+            return;
+        }
+
+        Result updated = new Result(
+                selectedResult.getResultId(),
+                ev.getEventId(),
+                ev.getEventName(),
+                p.getParticipantId(),
+                p.getName(),
+                p.getStudentId(),
+                score,
+                rankToUse
+        );
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return resultDAO.update(updated);
+            }
+        };
+        task.setOnSucceeded(e -> {
+            handleClearForm();
+            loadResults();
+            statusLabel.setText(rankToUse > 0 ? "Result updated with Rank #" + rankToUse + "." : "Score updated and ranks recalculated.");
+        });
+        task.setOnFailed(e -> showError("Update Error", task.getException().getMessage()));
         AppExecutor.getExecutor().submit(task);
     }
 
@@ -210,12 +316,43 @@ public class LeaderboardController {
     }
 
     @FXML
+    private void handleViewDetails() {
+        if (selectedResult == null) {
+            showError("No Selection", "Select a result row from the leaderboard to view details.");
+            return;
+        }
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setTitle("Leaderboard Result Details - #" + selectedResult.getResultId());
+        info.setHeaderText("Rank #" + selectedResult.getRank() + " — " + selectedResult.getParticipantName());
+        String details = String.format("""
+                Result ID: %d
+                Rank: #%d
+                Participant: %s (%s)
+                Event: #%d - %s
+                Score: %.2f
+                """,
+                selectedResult.getResultId(),
+                selectedResult.getRank(),
+                selectedResult.getParticipantName(),
+                selectedResult.getStudentId(),
+                selectedResult.getEventId(),
+                selectedResult.getEventName(),
+                selectedResult.getScore()
+        );
+        info.setContentText(details);
+        info.showAndWait();
+    }
+
+    @FXML
     public void handleClearForm() {
         selectedResult = null;
         leaderboardTable.getSelectionModel().clearSelection();
         eventCombo.setValue(null);
         participantCombo.setValue(null);
         scoreField.clear();
+        if (rankField != null) {
+            rankField.clear();
+        }
     }
 
     private void showError(String title, String message) {
@@ -302,6 +439,3 @@ public class LeaderboardController {
         SceneNavigator.goForward();
     }
 }
-
-
-

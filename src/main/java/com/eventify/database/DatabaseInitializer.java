@@ -155,6 +155,11 @@ public class DatabaseInitializer {
             try (Statement s = conn.createStatement()) {
                 s.execute("UPDATE users SET full_name = 'EVA PODDER', email = 'evapodder@university.edu' WHERE username = 'admin'");
                 s.execute("UPDATE events SET organizer = 'EVA PODDER' WHERE organizer IN ('CSE Computer Club', 'Department of CSE', 'IEEE Student Branch')");
+                try (ResultSet rs = s.executeQuery("SELECT COUNT(*) - COUNT(DISTINCT rank) FROM results")) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        new com.eventify.dao.ResultDAO().recalculateAllRanks(conn);
+                    }
+                }
             }
 
         } catch (SQLException e) {

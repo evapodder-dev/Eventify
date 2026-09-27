@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,18 +21,23 @@ public class ResultDAO implements CrudDAO<Result, Integer> {
 
     @Override
     public boolean insert(Result result) {
+        boolean customRank = result.getRank() > 0;
+        int initialRank = customRank ? result.getRank() : 1;
         String sql = """
             INSERT INTO results (event_id, participant_id, score, rank)
-            VALUES (?, ?, ?, 1)
-            ON CONFLICT(event_id, participant_id) DO UPDATE SET score = excluded.score
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(event_id, participant_id) DO UPDATE SET score = excluded.score, rank = excluded.rank
             """;
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, result.getEventId());
             ps.setInt(2, result.getParticipantId());
             ps.setDouble(3, result.getScore());
+            ps.setInt(4, initialRank);
             boolean ok = ps.executeUpdate() > 0;
-            recalculateRanksForEvent(conn, result.getEventId());
+            if (!customRank) {
+                recalculateAllRanks(conn);
+            }
             return ok;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to save result: " + e.getMessage(), e);
@@ -40,13 +46,25 @@ public class ResultDAO implements CrudDAO<Result, Integer> {
 
     @Override
     public boolean update(Result result) {
-        String sql = "UPDATE results SET score = ? WHERE result_id = ?";
+        boolean customRank = result.getRank() > 0;
+        String sql = customRank
+                ? "UPDATE results SET event_id = ?, participant_id = ?, score = ?, rank = ? WHERE result_id = ?"
+                : "UPDATE results SET event_id = ?, participant_id = ?, score = ? WHERE result_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, result.getScore());
-            ps.setInt(2, result.getResultId());
+            ps.setInt(1, result.getEventId());
+            ps.setInt(2, result.getParticipantId());
+            ps.setDouble(3, result.getScore());
+            if (customRank) {
+                ps.setInt(4, result.getRank());
+                ps.setInt(5, result.getResultId());
+            } else {
+                ps.setInt(4, result.getResultId());
+            }
             boolean ok = ps.executeUpdate() > 0;
-            recalculateRanksForEvent(conn, result.getEventId());
+            if (!customRank) {
+                recalculateAllRanks(conn);
+            }
             return ok;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to update result: " + e.getMessage(), e);
@@ -55,15 +73,12 @@ public class ResultDAO implements CrudDAO<Result, Integer> {
 
     @Override
     public boolean delete(Integer id) {
-        Optional<Result> existing = findById(id);
         String sql = "DELETE FROM results WHERE result_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             boolean ok = ps.executeUpdate() > 0;
-            if (existing.isPresent()) {
-                recalculateRanksForEvent(conn, existing.get().getEventId());
-            }
+            recalculateAllRanks(conn);
             return ok;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to delete result: " + e.getMessage(), e);
@@ -108,8 +123,9 @@ public class ResultDAO implements CrudDAO<Result, Integer> {
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
-            // Sort using Java Collections and Result.compareTo (descending score)
-            Collections.sort(list);
+            // Sort by rank ascending, then score descending
+            list.sort(Comparator.comparingInt(Result::getRank)
+                    .thenComparing((a, b) -> Double.compare(b.getScore(), a.getScore())));
             return list;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to load results: " + e.getMessage(), e);
@@ -143,18 +159,16 @@ public class ResultDAO implements CrudDAO<Result, Integer> {
         }
     }
 
-    private void recalculateRanksForEvent(Connection conn, int eventId) throws SQLException {
-        String selectSql = "SELECT result_id, score FROM results WHERE event_id = ?";
+    public void recalculateAllRanks(Connection conn) throws SQLException {
+        String selectSql = "SELECT result_id, score FROM results";
         List<Result> temp = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
-            ps.setInt(1, eventId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Result r = new Result();
-                    r.setResultId(rs.getInt("result_id"));
-                    r.setScore(rs.getDouble("score"));
-                    temp.add(r);
-                }
+        try (PreparedStatement ps = conn.prepareStatement(selectSql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Result r = new Result();
+                r.setResultId(rs.getInt("result_id"));
+                r.setScore(rs.getDouble("score"));
+                temp.add(r);
             }
         }
         Collections.sort(temp);

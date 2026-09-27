@@ -105,7 +105,7 @@
                             <Font name="System Bold" size="20.0"/>
                         </font>
                     </Label>
-                    <Label fx:id="statusLabel" text="Record participant scores and automatically compute rankings via Java Collections sorting" textFill="#64748b">
+                    <Label fx:id="statusLabel" text="Record participant scores and dynamically compute or customize rankings" textFill="#64748b">
                         <font>
                             <Font size="12.0"/>
                         </font>
@@ -117,9 +117,10 @@
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <GridPane hgap="12.0" vgap="10.0">
                     <columnConstraints>
-                        <ColumnConstraints percentWidth="40.0"/>
-                        <ColumnConstraints percentWidth="35.0"/>
-                        <ColumnConstraints percentWidth="25.0"/>
+                        <ColumnConstraints percentWidth="32.0"/>
+                        <ColumnConstraints percentWidth="28.0"/>
+                        <ColumnConstraints percentWidth="20.0"/>
+                        <ColumnConstraints percentWidth="20.0"/>
                     </columnConstraints>
 
                     <VBox spacing="4.0" GridPane.columnIndex="0">
@@ -136,20 +137,31 @@
                         <Label text="Score *" textFill="#334155"/>
                         <TextField fx:id="scoreField" promptText="e.g., 95.5"/>
                     </VBox>
+
+                    <VBox spacing="4.0" GridPane.columnIndex="3">
+                        <Label text="Rank (Auto or Custom)" textFill="#334155"/>
+                        <TextField fx:id="rankField" promptText="Auto (by Score) or enter Rank"/>
+                    </VBox>
                 </GridPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <Button onAction="#handleSaveResult" prefHeight="34.0"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
-                            text="Save / Update Score"/>
+                            text="Add Result"/>
+                    <Button onAction="#handleUpdateResult" prefHeight="34.0"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Update Result"/>
                     <Button onAction="#handleDeleteResult" prefHeight="34.0"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Result"/>
+                    <Button onAction="#handleViewDetails" prefHeight="34.0"
+                            style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="View Details"/>
                     <Button onAction="#handleClearForm" prefHeight="34.0"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>
                     <HBox HBox.hgrow="ALWAYS"/>
-                    <ComboBox fx:id="filterEventCombo" onAction="#handleFilterByEvent" prefWidth="250.0"
+                    <ComboBox fx:id="filterEventCombo" onAction="#handleFilterByEvent" prefWidth="230.0"
                               promptText="Filter Leaderboard by Event"/>
                     <Button onAction="#loadResults"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-cursor: hand;"
@@ -161,16 +173,15 @@
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <TableView fx:id="leaderboardTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colRank" prefWidth="75.0" text="Rank"/>
-                        <TableColumn fx:id="colParticipant" prefWidth="210.0" text="Participant Name"/>
-                        <TableColumn fx:id="colStudentId" prefWidth="140.0" text="Student ID"/>
-                        <TableColumn fx:id="colScore" prefWidth="110.0" text="Score"/>
-                        <TableColumn fx:id="colEvent" prefWidth="280.0" text="Event Name"/>
-                        <TableColumn fx:id="colResultId" prefWidth="80.0" text="Result ID"/>
+                        <TableColumn fx:id="colRank" text="Rank"/>
+                        <TableColumn fx:id="colParticipant" text="Participant Name"/>
+                        <TableColumn fx:id="colStudentId" text="Student ID"/>
+                        <TableColumn fx:id="colScore" text="Score"/>
+                        <TableColumn fx:id="colEvent" text="Event Name"/>
+                        <TableColumn fx:id="colResultId" text="Result ID"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
-
