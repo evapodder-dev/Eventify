@@ -25,28 +25,51 @@ public class UserDAO {
     public Optional<User> authenticate(String username, String password) {
         String trimmedUser = username != null ? username.trim() : "";
         String sql = "SELECT user_id, username, password, full_name, email, role FROM users WHERE username = ? AND password = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, trimmedUser);
+                ps.setString(2, password);
 
-            ps.setString(1, trimmedUser);
-            ps.setString(2, password);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int id = rs.getInt("user_id");
+                        String uname = rs.getString("username");
+                        String pwd = rs.getString("password");
+                        String fullName = rs.getString("full_name");
+                        String email = rs.getString("email");
+                        String role = rs.getString("role");
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt("user_id");
-                    String uname = rs.getString("username");
-                    String pwd = rs.getString("password");
-                    String fullName = rs.getString("full_name");
-                    String email = rs.getString("email");
-                    String role = rs.getString("role");
-
-                    if ("Organizer".equalsIgnoreCase(role)) {
-                        return Optional.of(new Organizer(id, uname, pwd, fullName, email));
-                    } else {
-                        return Optional.of(new Participant(id, uname, pwd, uname, email));
+                        if ("Organizer".equalsIgnoreCase(role)) {
+                            return Optional.of(new Organizer(id, uname, pwd, fullName, email));
+                        } else {
+                            return Optional.of(new Participant(id, uname, pwd, uname, email));
+                        }
                     }
                 }
             }
+
+            // If this Roll exists in participants table but doesn't have a users row yet, allow Sign In and create user row
+            String checkUserExists = "SELECT 1 FROM users WHERE username = ?";
+            boolean userExists = false;
+            try (PreparedStatement checkPs = conn.prepareStatement(checkUserExists)) {
+                checkPs.setString(1, trimmedUser);
+                try (ResultSet rs = checkPs.executeQuery()) {
+                    userExists = rs.next();
+                }
+            }
+
+            if (!userExists) {
+                String checkParticipantSql = "SELECT email FROM participants WHERE student_id = ?";
+                try (PreparedStatement partPs = conn.prepareStatement(checkParticipantSql)) {
+                    partPs.setString(1, trimmedUser);
+                    try (ResultSet rs = partPs.executeQuery()) {
+                        if (rs.next()) {
+                            return Optional.of(registerUser(trimmedUser, password, "Participant"));
+                        }
+                    }
+                }
+            }
+
             return Optional.empty();
         } catch (SQLException e) {
             throw new DatabaseException("Database error during login authentication: " + e.getMessage(), e);
@@ -55,6 +78,7 @@ public class UserDAO {
 
     /**
      * Registers a new user account (Sign Up) in SQLite.
+     * Avoids Statement.RETURN_GENERATED_KEYS because sqlite-jdbc 3.44 throws SQLFeatureNotSupportedException.
      * If the role is Participant, also ensures a corresponding participant record exists by Roll.
      */
     public User registerUser(String username, String password, String role) {
@@ -62,30 +86,32 @@ public class UserDAO {
         String normalizedRole = "Organizer".equalsIgnoreCase(role) ? "Organizer" : "Participant";
         String email = trimmedUser + "@student.university.edu";
 
-        String checkSql = "SELECT user_id FROM users WHERE username = ?";
-        String insertUserSql = "INSERT INTO users (username, password, full_name, email, role) VALUES (?, ?, ?, ?, ?)";
+        String upsertUserSql = """
+            INSERT INTO users (username, password, full_name, email, role)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(username) DO UPDATE SET
+                password = excluded.password,
+                full_name = excluded.full_name,
+                role = excluded.role
+            """;
+        String findIdSql = "SELECT user_id FROM users WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
-                checkPs.setString(1, trimmedUser);
-                try (ResultSet rs = checkPs.executeQuery()) {
-                    if (rs.next()) {
-                        throw new DatabaseException("ID / Roll '" + trimmedUser + "' is already registered. Please click Sign In.");
-                    }
-                }
-            }
-
-            int newUserId = 0;
-            try (PreparedStatement insertPs = conn.prepareStatement(insertUserSql, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement insertPs = conn.prepareStatement(upsertUserSql)) {
                 insertPs.setString(1, trimmedUser);
                 insertPs.setString(2, password);
                 insertPs.setString(3, trimmedUser);
                 insertPs.setString(4, email);
                 insertPs.setString(5, normalizedRole);
                 insertPs.executeUpdate();
-                try (ResultSet keys = insertPs.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        newUserId = keys.getInt(1);
+            }
+
+            int newUserId = 0;
+            try (PreparedStatement idPs = conn.prepareStatement(findIdSql)) {
+                idPs.setString(1, trimmedUser);
+                try (ResultSet rs = idPs.executeQuery()) {
+                    if (rs.next()) {
+                        newUserId = rs.getInt("user_id");
                     }
                 }
             }
