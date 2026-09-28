@@ -1,5 +1,8 @@
 package com.eventify.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -8,6 +11,7 @@ import java.util.Map;
  * Demonstrates: Implementing multiple interfaces (Searchable, Exportable),
  * Comparable interface for natural ordering, and Enum usage.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Event implements Searchable, Exportable, Comparable<Event> {
 
     private int eventId;
@@ -59,6 +63,7 @@ public class Event implements Searchable, Exportable, Comparable<Event> {
     }
 
     @Override
+    @JsonIgnore
     public String getSearchLabel() {
         return "#" + eventId + " " + eventName + " [" + category + "]";
     }
@@ -95,6 +100,7 @@ public class Event implements Searchable, Exportable, Comparable<Event> {
     }
 
     // --- Enum convenience ---
+    @JsonIgnore
     public EventStatus getEventStatus() {
         return EventStatus.fromString(status);
     }

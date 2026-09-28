@@ -99,12 +99,12 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 14 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
-                    <Label text="External API Events (Java HttpClient + Gson Parser)" textFill="#0f172a">
+                    <Label text="External API Events (Java HttpClient + Jackson JSON Parser)" textFill="#0f172a">
                         <font>
                             <Font name="System Bold" size="20.0"/>
                         </font>
                     </Label>
-                    <Label fx:id="statusLabel" text="HTTP Request -> JSON Response -> Gson Parser -> Java Objects -> JavaFX TableView" textFill="#64748b">
+                    <Label fx:id="statusLabel" text="HTTP Request -> JSON Response -> Jackson ObjectMapper -> Java Objects -> JavaFX TableView" textFill="#64748b">
                         <font>
                             <Font size="12.0"/>
                         </font>

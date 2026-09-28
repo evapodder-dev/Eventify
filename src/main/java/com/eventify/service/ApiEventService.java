@@ -1,12 +1,10 @@
 package com.eventify.service;
 
 import com.eventify.model.ApiEvent;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service handling HTTP API requests using Java's HttpClient, HttpRequest, and HttpResponse.
+ * Service handling HTTP API requests using Java's HttpClient, HttpRequest, and HttpResponse,
+ * and parsing JSON payloads using Jackson ObjectMapper and JsonNode.
  * Demonstrates full error handling (HTTP error, timeout, network error, invalid JSON, empty response)
  * as well as a local JSON fallback for reliable APL lab demonstrations.
  */
@@ -45,7 +44,7 @@ public class ApiEventService {
             "category": "Competition",
             "date": "2026-11-05",
             "venue": "Innovation Hub Auditorium",
-            "organizer": "CSE Society & IEEE Branch",
+            "organizer": "EVA PODDER",
             "maxParticipants": 150,
             "body": "24-hour inter-university software hackathon focusing on EdTech and Smart Campus solutions."
           },
@@ -55,7 +54,7 @@ public class ApiEventService {
             "category": "Workshop",
             "date": "2026-11-12",
             "venue": "Software Lab 302",
-            "organizer": "Developer Student Club",
+            "organizer": "EVA PODDER",
             "maxParticipants": 80,
             "body": "Practical workshop on containerization, CI/CD pipelines, and distributed systems."
           },
@@ -65,7 +64,7 @@ public class ApiEventService {
             "category": "Cultural Event",
             "date": "2026-11-20",
             "venue": "Central Campus Plaza",
-            "organizer": "University Cultural & Robotics Club",
+            "organizer": "EVA PODDER",
             "maxParticipants": 300,
             "body": "Combined showcase of autonomous line-follower robots and evening cultural performances."
           },
@@ -75,7 +74,7 @@ public class ApiEventService {
             "category": "Seminar",
             "date": "2026-11-28",
             "venue": "Seminar Hall B",
-            "organizer": "Alumni Association",
+            "organizer": "EVA PODDER",
             "maxParticipants": 120,
             "body": "Guidance on graduate admissions, research publications, and fellowship opportunities."
           }
@@ -83,13 +82,15 @@ public class ApiEventService {
         """;
 
     private final HttpClient httpClient;
-    private final Gson gson = new Gson();
+    private final ObjectMapper objectMapper;
 
     public ApiEventService() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(6))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
+        this.objectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public String getDefaultApiUrl() {
@@ -148,7 +149,7 @@ public class ApiEventService {
 
             return new ApiFetchResult(
                     true, false, status,
-                    "HTTP " + status + " OK — Successfully fetched and parsed " + parsed.size() + " API events.",
+                    "HTTP " + status + " OK — Successfully fetched and parsed " + parsed.size() + " API events via Jackson.",
                     body,
                     parsed
             );
@@ -160,10 +161,10 @@ public class ApiEventService {
                     "",
                     List.of()
             );
-        } catch (JsonSyntaxException e) {
+        } catch (JsonProcessingException e) {
             return new ApiFetchResult(
                     false, false, 200,
-                    "Invalid JSON format in API response: " + e.getMessage(),
+                    "Invalid JSON format in API response (Jackson): " + e.getOriginalMessage(),
                     "",
                     List.of()
             );
@@ -186,45 +187,46 @@ public class ApiEventService {
     }
 
     public ApiFetchResult loadFallbackEvents() {
-        List<ApiEvent> parsed = parseJsonPayload(MOCK_FALLBACK_JSON);
-        return new ApiFetchResult(
-                true, true, 200,
-                "Loaded " + parsed.size() + " university events from built-in Local JSON Fallback.",
-                MOCK_FALLBACK_JSON,
-                parsed
-        );
+        try {
+            List<ApiEvent> parsed = parseJsonPayload(MOCK_FALLBACK_JSON);
+            return new ApiFetchResult(
+                    true, true, 200,
+                    "Loaded " + parsed.size() + " university events from Local JSON Fallback using Jackson ObjectMapper.",
+                    MOCK_FALLBACK_JSON,
+                    parsed
+            );
+        } catch (JsonProcessingException e) {
+            return new ApiFetchResult(false, true, 500, "Fallback JSON error: " + e.getMessage(), MOCK_FALLBACK_JSON, List.of());
+        }
     }
 
-    public List<ApiEvent> parseJsonPayload(String json) {
-        JsonElement root = JsonParser.parseString(json);
-        if (root == null || root.isJsonNull()) {
+    public List<ApiEvent> parseJsonPayload(String json) throws JsonProcessingException {
+        JsonNode root = objectMapper.readTree(json);
+        if (root == null || root.isNull() || root.isMissingNode()) {
             return List.of();
         }
 
-        JsonArray array;
-        if (root.isJsonArray()) {
-            array = root.getAsJsonArray();
-        } else if (root.isJsonObject()) {
-            JsonObject obj = root.getAsJsonObject();
-            if (obj.has("events") && obj.get("events").isJsonArray()) {
-                array = obj.getAsJsonArray("events");
+        List<JsonNode> nodes = new ArrayList<>();
+        if (root.isArray()) {
+            root.forEach(nodes::add);
+        } else if (root.isObject()) {
+            if (root.has("events") && root.get("events").isArray()) {
+                root.get("events").forEach(nodes::add);
             } else {
-                array = new JsonArray();
-                array.add(obj);
+                nodes.add(root);
             }
         } else {
-            throw new JsonSyntaxException("Expected JSON array or object");
+            throw new JsonProcessingException("Expected JSON array or object") {};
         }
 
         String[] categories = {"Programming Contest", "Workshop", "Seminar", "Competition", "Club Program", "Cultural Event"};
         String[] venues = {"CSE Auditorium 101", "Software Lab 204", "Central Conference Hall", "Innovation Center", "Robotics Arena", "Campus Amphitheater"};
-        String[] organizers = {"CSE Computer Club", "IEEE Student Branch", "Software Engineering Society", "Robotics Club", "Department of CSE", "University Debate Forum"};
 
         List<ApiEvent> list = new ArrayList<>();
         int idx = 0;
-        for (JsonElement el : array) {
-            if (!el.isJsonObject()) continue;
-            ApiEvent item = gson.fromJson(el, ApiEvent.class);
+        for (JsonNode node : nodes) {
+            if (!node.isObject()) continue;
+            ApiEvent item = objectMapper.treeToValue(node, ApiEvent.class);
             if (item.getId() <= 0) {
                 item.setId(idx + 1);
             }
@@ -233,19 +235,19 @@ public class ApiEventService {
             } else if (item.getTitle().length() > 55) {
                 item.setTitle(item.getTitle().substring(0, 55));
             }
-            if (!el.getAsJsonObject().has("category")) {
+            if (!node.has("category")) {
                 item.setCategory(categories[idx % categories.length]);
             }
-            if (!el.getAsJsonObject().has("date")) {
+            if (!node.has("date")) {
                 item.setDate(String.format("2026-11-%02d", 10 + (idx % 18)));
             }
-            if (!el.getAsJsonObject().has("venue")) {
+            if (!node.has("venue")) {
                 item.setVenue(venues[idx % venues.length]);
             }
-            if (!el.getAsJsonObject().has("organizer")) {
-                item.setOrganizer(organizers[idx % organizers.length]);
+            if (!node.has("organizer")) {
+                item.setOrganizer("EVA PODDER");
             }
-            if (!el.getAsJsonObject().has("maxParticipants")) {
+            if (!node.has("maxParticipants")) {
                 item.setMaxParticipants(60 + (idx * 20));
             }
             list.add(item);
