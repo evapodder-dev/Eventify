@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -20,6 +21,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -31,6 +33,8 @@ import java.util.List;
  */
 public class EventController {
 
+    @FXML
+    private GridPane eventFormGrid;
     @FXML
     private TextField eventNameField;
     @FXML
@@ -61,9 +65,20 @@ public class EventController {
     private ProgressIndicator loadingIndicator;
 
     @FXML
-    private TableView<Event> eventsTable;
+    private Button exportJsonBtn;
     @FXML
-    private TableColumn<Event, Number> colId;
+    private Button importJsonBtn;
+    @FXML
+    private Button addEventBtn;
+    @FXML
+    private Button updateEventBtn;
+    @FXML
+    private Button deleteEventBtn;
+    @FXML
+    private Button clearEventBtn;
+
+    @FXML
+    private TableView<Event> eventsTable;
     @FXML
     private TableColumn<Event, String> colName;
     @FXML
@@ -89,6 +104,8 @@ public class EventController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
+        applyRolePermissions();
+
         categoryCombo.setItems(FXCollections.observableArrayList(
                 "Workshop", "Programming Contest", "Seminar", "Competition", "Club Program", "Cultural Event"
         ));
@@ -99,7 +116,6 @@ public class EventController {
         filterStatusCombo.setItems(FXCollections.observableArrayList("All", "Upcoming", "Ongoing", "Completed"));
         filterStatusCombo.setValue("All");
 
-        colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getEventId()));
         colName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEventName()));
         colCategory.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCategory()));
         colDate.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDate()));
@@ -112,7 +128,7 @@ public class EventController {
 
         // Responsive: bind columns to percentages of table width
         ResponsiveHelper.bindColumnWidths(eventsTable,
-                0.05, 0.18, 0.12, 0.10, 0.08, 0.08, 0.13, 0.12, 0.06, 0.08);
+                0.20, 0.13, 0.11, 0.08, 0.08, 0.14, 0.12, 0.06, 0.08);
 
         // Make search field responsive — stretch to fill available space
         searchField.maxWidthProperty().bind(eventsTable.widthProperty().multiply(0.4));
@@ -124,6 +140,39 @@ public class EventController {
         });
 
         loadEvents();
+    }
+
+    private void applyRolePermissions() {
+        if (!SessionManager.isOrganizer()) {
+            if (eventFormGrid != null) {
+                eventFormGrid.setVisible(false);
+                eventFormGrid.setManaged(false);
+            }
+            if (addEventBtn != null) {
+                addEventBtn.setVisible(false);
+                addEventBtn.setManaged(false);
+            }
+            if (updateEventBtn != null) {
+                updateEventBtn.setVisible(false);
+                updateEventBtn.setManaged(false);
+            }
+            if (deleteEventBtn != null) {
+                deleteEventBtn.setVisible(false);
+                deleteEventBtn.setManaged(false);
+            }
+            if (clearEventBtn != null) {
+                clearEventBtn.setVisible(false);
+                clearEventBtn.setManaged(false);
+            }
+            if (exportJsonBtn != null) {
+                exportJsonBtn.setVisible(false);
+                exportJsonBtn.setManaged(false);
+            }
+            if (importJsonBtn != null) {
+                importJsonBtn.setVisible(false);
+                importJsonBtn.setManaged(false);
+            }
+        }
     }
 
     @FXML
@@ -250,10 +299,9 @@ public class EventController {
             return;
         }
         Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Event Details — #" + selectedEvent.getEventId());
+        info.setTitle("Event Details — " + selectedEvent.getEventName());
         info.setHeaderText(selectedEvent.getEventName() + " (" + selectedEvent.getCategory() + ")");
         String details = String.format("""
-                Event ID: %d
                 Status: %s
                 Date: %s
                 Time: %s - %s
@@ -264,7 +312,6 @@ public class EventController {
                 Description:
                 %s
                 """,
-                selectedEvent.getEventId(),
                 selectedEvent.getStatus(),
                 selectedEvent.getDate(),
                 selectedEvent.getStartTime(),

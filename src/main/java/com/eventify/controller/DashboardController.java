@@ -48,8 +48,6 @@ public class DashboardController {
     @FXML
     private TableView<Event> recentEventsTable;
     @FXML
-    private TableColumn<Event, Number> colId;
-    @FXML
     private TableColumn<Event, String> colName;
     @FXML
     private TableColumn<Event, String> colCategory;
@@ -74,7 +72,6 @@ public class DashboardController {
             accessSummaryLabel.setText(currentUser.getAccessSummary());
         }
 
-        colId.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getEventId()));
         colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getEventName()));
         colCategory.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCategory()));
         colDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDate()));
@@ -82,11 +79,10 @@ public class DashboardController {
         colOrganizer.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getOrganizer()));
         colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
 
-        
         // Responsive layout: bind table column widths to percentage of table width
         ResponsiveHelper.bindColumnWidths(recentEventsTable,
-                0.06, 0.25, 0.15, 0.12, 0.18, 0.14, 0.10);
-refreshDashboard();
+                0.28, 0.16, 0.13, 0.19, 0.14, 0.10);
+        refreshDashboard();
     }
 
     @FXML

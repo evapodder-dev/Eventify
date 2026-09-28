@@ -116,7 +116,7 @@
 
             <VBox spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
-                <GridPane hgap="12.0" vgap="10.0">
+                <GridPane fx:id="scheduleFormGrid" hgap="12.0" vgap="10.0">
                     <columnConstraints>
                         <ColumnConstraints percentWidth="34.0"/>
                         <ColumnConstraints percentWidth="33.0"/>
@@ -155,19 +155,19 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Button onAction="#handleAddSchedule" prefHeight="34.0"
+                    <Button fx:id="addScheduleBtn" onAction="#handleAddSchedule" prefHeight="34.0"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Add Schedule"/>
-                    <Button onAction="#handleUpdateSchedule" prefHeight="34.0"
+                    <Button fx:id="updateScheduleBtn" onAction="#handleUpdateSchedule" prefHeight="34.0"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Edit Schedule"/>
-                    <Button onAction="#handleDeleteSchedule" prefHeight="34.0"
+                    <Button fx:id="deleteScheduleBtn" onAction="#handleDeleteSchedule" prefHeight="34.0"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Schedule"/>
                     <Button onAction="#handleViewDetails" prefHeight="34.0"
                             style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Schedule Details"/>
-                    <Button onAction="#handleClearForm" prefHeight="34.0"
+                    <Button fx:id="clearScheduleBtn" onAction="#handleClearForm" prefHeight="34.0"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>
                     <HBox HBox.hgrow="ALWAYS"/>
@@ -183,17 +183,15 @@
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <TableView fx:id="scheduleTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="65.0" text="ID"/>
-                        <TableColumn fx:id="colEvent" prefWidth="240.0" text="Event"/>
-                        <TableColumn fx:id="colActivity" prefWidth="230.0" text="Activity Name"/>
-                        <TableColumn fx:id="colDate" prefWidth="110.0" text="Date"/>
-                        <TableColumn fx:id="colStart" prefWidth="90.0" text="Start Time"/>
-                        <TableColumn fx:id="colEnd" prefWidth="90.0" text="End Time"/>
-                        <TableColumn fx:id="colVenue" prefWidth="180.0" text="Venue"/>
+                        <TableColumn fx:id="colEvent" text="Event"/>
+                        <TableColumn fx:id="colActivity" text="Activity Name"/>
+                        <TableColumn fx:id="colDate" text="Date"/>
+                        <TableColumn fx:id="colStart" text="Start Time"/>
+                        <TableColumn fx:id="colEnd" text="End Time"/>
+                        <TableColumn fx:id="colVenue" text="Venue"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
-

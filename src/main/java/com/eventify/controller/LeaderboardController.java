@@ -17,11 +17,13 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ import java.util.List;
  */
 public class LeaderboardController {
 
+    @FXML
+    private GridPane leaderboardFormGrid;
     @FXML
     private ComboBox<Event> eventCombo;
     @FXML
@@ -44,6 +48,15 @@ public class LeaderboardController {
     private Label statusLabel;
 
     @FXML
+    private Button addResultBtn;
+    @FXML
+    private Button updateResultBtn;
+    @FXML
+    private Button deleteResultBtn;
+    @FXML
+    private Button clearResultBtn;
+
+    @FXML
     private TableView<Result> leaderboardTable;
     @FXML
     private TableColumn<Result, Number> colRank;
@@ -55,8 +68,6 @@ public class LeaderboardController {
     private TableColumn<Result, Number> colScore;
     @FXML
     private TableColumn<Result, String> colEvent;
-    @FXML
-    private TableColumn<Result, Number> colResultId;
 
     private final ResultDAO resultDAO = new ResultDAO();
     private final EventDAO eventDAO = new EventDAO();
@@ -66,12 +77,13 @@ public class LeaderboardController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
+        applyRolePermissions();
+
         colRank.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getRank()));
-        colParticipant.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getParticipantName()));
         colStudentId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStudentId()));
+        colParticipant.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getParticipantName()));
         colScore.setCellValueFactory(c -> new SimpleDoubleProperty(c.getValue().getScore()));
-        colEvent.setCellValueFactory(c -> new SimpleStringProperty("#" + c.getValue().getEventId() + " - " + c.getValue().getEventName()));
-        colResultId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getResultId()));
+        colEvent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEventName()));
 
         leaderboardTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
             if (newV != null) {
@@ -97,10 +109,35 @@ public class LeaderboardController {
 
         // Responsive: bind leaderboard table columns to table width
         if (leaderboardTable != null && leaderboardTable.getColumns().size() >= 5) {
-            ResponsiveHelper.bindColumnWidths(leaderboardTable, 0.08, 0.22, 0.20, 0.15, 0.22, 0.08);
+            ResponsiveHelper.bindColumnWidths(leaderboardTable, 0.10, 0.18, 0.24, 0.16, 0.32);
         }
 
         loadResults();
+    }
+
+    private void applyRolePermissions() {
+        if (!SessionManager.isOrganizer()) {
+            if (leaderboardFormGrid != null) {
+                leaderboardFormGrid.setVisible(false);
+                leaderboardFormGrid.setManaged(false);
+            }
+            if (addResultBtn != null) {
+                addResultBtn.setVisible(false);
+                addResultBtn.setManaged(false);
+            }
+            if (updateResultBtn != null) {
+                updateResultBtn.setVisible(false);
+                updateResultBtn.setManaged(false);
+            }
+            if (deleteResultBtn != null) {
+                deleteResultBtn.setVisible(false);
+                deleteResultBtn.setManaged(false);
+            }
+            if (clearResultBtn != null) {
+                clearResultBtn.setVisible(false);
+                clearResultBtn.setManaged(false);
+            }
+        }
     }
 
     @FXML
@@ -170,7 +207,6 @@ public class LeaderboardController {
             if (parsed <= 0) {
                 throw new IllegalArgumentException("Rank must be a positive integer (1, 2, 3...) or left empty for auto-ranking.");
             }
-            // If a row was selected and the user did not change the rank text when adding a different entry, auto-rank it
             if (selectedResult != null && parsed == selectedResult.getRank()) {
                 return 0;
             }
@@ -190,7 +226,6 @@ public class LeaderboardController {
             if (parsed <= 0) {
                 throw new IllegalArgumentException("Rank must be a positive integer (1, 2, 3...) or left empty for auto-ranking.");
             }
-            // If the user changed the score but kept the old rank text untouched, auto-recalculate the rank based on the new score
             if (selectedResult != null
                     && parsed == selectedResult.getRank()
                     && Double.compare(newScore, selectedResult.getScore()) != 0) {
@@ -204,6 +239,10 @@ public class LeaderboardController {
 
     @FXML
     private void handleSaveResult() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can add leaderboard scores.");
+            return;
+        }
         Event ev = eventCombo.getValue();
         Participant p = participantCombo.getValue();
         if (ev == null || p == null) {
@@ -243,6 +282,10 @@ public class LeaderboardController {
 
     @FXML
     private void handleUpdateResult() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can update leaderboard scores.");
+            return;
+        }
         if (selectedResult == null) {
             showError("No Selection", "Please select a result row from the leaderboard to update.");
             return;
@@ -295,6 +338,10 @@ public class LeaderboardController {
 
     @FXML
     private void handleDeleteResult() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can delete leaderboard results.");
+            return;
+        }
         if (selectedResult == null) {
             showError("No Selection", "Select a result row from the leaderboard to delete.");
             return;
@@ -322,20 +369,18 @@ public class LeaderboardController {
             return;
         }
         Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Leaderboard Result Details - #" + selectedResult.getResultId());
+        info.setTitle("Leaderboard Result Details — Roll: " + selectedResult.getStudentId());
         info.setHeaderText("Rank #" + selectedResult.getRank() + " — " + selectedResult.getParticipantName());
         String details = String.format("""
-                Result ID: %d
                 Rank: #%d
-                Participant: %s (%s)
-                Event: #%d - %s
+                Roll: %s
+                Participant: %s
+                Event: %s
                 Score: %.2f
                 """,
-                selectedResult.getResultId(),
                 selectedResult.getRank(),
-                selectedResult.getParticipantName(),
                 selectedResult.getStudentId(),
-                selectedResult.getEventId(),
+                selectedResult.getParticipantName(),
                 selectedResult.getEventName(),
                 selectedResult.getScore()
         );

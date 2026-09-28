@@ -151,10 +151,13 @@ public class DatabaseInitializer {
 
             seedInitialData(conn);
 
-            // Ensure Organizer name is set to EVA PODDER in existing databases
+            // Ensure Organizer name is set to EVA PODDER and Roll numbers use numeric format (e.g., 2307032)
             try (Statement s = conn.createStatement()) {
                 s.execute("UPDATE users SET full_name = 'EVA PODDER', email = 'evapodder@university.edu' WHERE username = 'admin'");
                 s.execute("UPDATE events SET organizer = 'EVA PODDER' WHERE organizer IN ('CSE Computer Club', 'Department of CSE', 'IEEE Student Branch')");
+                s.execute("UPDATE participants SET student_id = '2307032' WHERE student_id = 'CSE-2023-014'");
+                s.execute("UPDATE participants SET student_id = '2307033' WHERE student_id = 'CSE-2023-028'");
+                s.execute("UPDATE participants SET student_id = '2307034' WHERE student_id = 'EEE-2024-009'");
                 try (ResultSet rs = s.executeQuery("SELECT COUNT(*) - COUNT(DISTINCT rank) FROM results")) {
                     if (rs.next() && rs.getInt(1) > 0) {
                         new com.eventify.dao.ResultDAO().recalculateAllRanks(conn);
@@ -183,7 +186,7 @@ public class DatabaseInitializer {
 
                     ps.setString(1, "student");
                     ps.setString(2, "student123");
-                    ps.setString(3, "Tanvir Ahmed (Participant)");
+                    ps.setString(3, "Tanvir Ahmed (Roll: 2307032)");
                     ps.setString(4, "tanvir@student.university.edu");
                     ps.setString(5, "Participant");
                     ps.executeUpdate();
@@ -244,7 +247,7 @@ public class DatabaseInitializer {
                     """;
                 try (PreparedStatement ps = conn.prepareStatement(partSql)) {
                     ps.setString(1, "Tanvir Ahmed");
-                    ps.setString(2, "CSE-2023-014");
+                    ps.setString(2, "2307032");
                     ps.setString(3, "tanvir@student.university.edu");
                     ps.setString(4, "01711001122");
                     ps.setString(5, "CSE");
@@ -252,7 +255,7 @@ public class DatabaseInitializer {
                     ps.executeUpdate();
 
                     ps.setString(1, "Nusrat Jahan");
-                    ps.setString(2, "CSE-2023-028");
+                    ps.setString(2, "2307033");
                     ps.setString(3, "nusrat@student.university.edu");
                     ps.setString(4, "01819223344");
                     ps.setString(5, "CSE");
@@ -260,7 +263,7 @@ public class DatabaseInitializer {
                     ps.executeUpdate();
 
                     ps.setString(1, "Rafiul Islam");
-                    ps.setString(2, "EEE-2024-009");
+                    ps.setString(2, "2307034");
                     ps.setString(3, "rafiul@student.university.edu");
                     ps.setString(4, "01912556677");
                     ps.setString(5, "EEE");

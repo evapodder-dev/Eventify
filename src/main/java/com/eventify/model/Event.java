@@ -190,6 +190,6 @@ public class Event implements Searchable, Exportable, Comparable<Event> {
 
     @Override
     public String toString() {
-        return eventId > 0 ? ("#" + eventId + " - " + eventName) : eventName;
+        return eventName;
     }
 }

@@ -10,25 +10,29 @@ import com.eventify.util.AppExecutor;
 import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 import java.util.List;
 
 /**
- * Controller for participants.fxml handling Participant CRUD, Event Registration, and Attendance Marking.
+ * Controller for participants.fxml handling Participant CRUD (by Roll), Event Registration, and Attendance Marking.
  */
 public class ParticipantController {
 
+    @FXML
+    private GridPane participantFormGrid;
     @FXML
     private TextField nameField;
     @FXML
@@ -47,9 +51,18 @@ public class ParticipantController {
     private Label statusLabel;
 
     @FXML
-    private TableView<Participant> participantsTable;
+    private Button addParticipantBtn;
     @FXML
-    private TableColumn<Participant, Number> colPartId;
+    private Button updateParticipantBtn;
+    @FXML
+    private Button deleteParticipantBtn;
+    @FXML
+    private Button clearParticipantBtn;
+    @FXML
+    private HBox attendanceControlsBox;
+
+    @FXML
+    private TableView<Participant> participantsTable;
     @FXML
     private TableColumn<Participant, String> colPartName;
     @FXML
@@ -70,8 +83,6 @@ public class ParticipantController {
     @FXML
     private TableView<Registration> registrationsTable;
     @FXML
-    private TableColumn<Registration, Number> colRegId;
-    @FXML
     private TableColumn<Registration, String> colRegParticipant;
     @FXML
     private TableColumn<Registration, String> colRegStudentId;
@@ -90,20 +101,20 @@ public class ParticipantController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
+        applyRolePermissions();
+
         departmentCombo.setItems(FXCollections.observableArrayList("CSE", "EEE", "SWE", "ME", "CE", "BBA"));
         yearCombo.setItems(FXCollections.observableArrayList("1st Year", "2nd Year", "3rd Year", "4th Year"));
 
-        colPartId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getParticipantId()));
-        colPartName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getName()));
         colStudentId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStudentId()));
+        colPartName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getName()));
         colEmail.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEmail()));
         colPhone.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPhone()));
         colDepartment.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDepartment()));
         colYear.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getYear()));
 
-        colRegId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getRegistrationId()));
-        colRegParticipant.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getParticipantName()));
         colRegStudentId.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStudentId()));
+        colRegParticipant.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getParticipantName()));
         colRegEvent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEventName()));
         colRegDate.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getRegistrationDate()));
         colRegAttendance.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getAttendanceStatus()));
@@ -122,10 +133,28 @@ public class ParticipantController {
         });
 
         // Responsive: bind participant and registration table columns to table width
-        ResponsiveHelper.bindColumnWidths(participantsTable, 0.06, 0.16, 0.12, 0.18, 0.14, 0.18, 0.10);
-        ResponsiveHelper.bindColumnWidths(registrationsTable, 0.08, 0.20, 0.14, 0.22, 0.18, 0.14);
+        ResponsiveHelper.bindColumnWidths(participantsTable, 0.14, 0.20, 0.22, 0.16, 0.14, 0.14);
+        ResponsiveHelper.bindColumnWidths(registrationsTable, 0.15, 0.22, 0.31, 0.16, 0.16);
 
         loadAllData();
+    }
+
+    private void applyRolePermissions() {
+        boolean isOrganizer = SessionManager.isOrganizer();
+        if (!isOrganizer) {
+            if (updateParticipantBtn != null) {
+                updateParticipantBtn.setVisible(false);
+                updateParticipantBtn.setManaged(false);
+            }
+            if (deleteParticipantBtn != null) {
+                deleteParticipantBtn.setVisible(false);
+                deleteParticipantBtn.setManaged(false);
+            }
+            if (attendanceControlsBox != null) {
+                attendanceControlsBox.setVisible(false);
+                attendanceControlsBox.setManaged(false);
+            }
+        }
     }
 
     private void loadAllData() {
@@ -167,7 +196,7 @@ public class ParticipantController {
             task.setOnSucceeded(e -> {
                 handleClearParticipantForm();
                 loadAllData();
-                statusLabel.setText("Participant added successfully.");
+                statusLabel.setText("Participant (Roll: " + p.getStudentId() + ") added successfully.");
             });
             task.setOnFailed(e -> showError("Failed to Add Participant", task.getException().getMessage()));
             AppExecutor.getExecutor().submit(task);
@@ -178,6 +207,10 @@ public class ParticipantController {
 
     @FXML
     private void handleUpdateParticipant() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can update participant records.");
+            return;
+        }
         if (selectedParticipant == null) {
             showError("No Selection", "Select a participant from the table to update.");
             return;
@@ -193,7 +226,7 @@ public class ParticipantController {
             task.setOnSucceeded(e -> {
                 handleClearParticipantForm();
                 loadAllData();
-                statusLabel.setText("Participant updated.");
+                statusLabel.setText("Participant (Roll: " + p.getStudentId() + ") updated.");
             });
             task.setOnFailed(e -> showError("Update Error", task.getException().getMessage()));
             AppExecutor.getExecutor().submit(task);
@@ -204,6 +237,10 @@ public class ParticipantController {
 
     @FXML
     private void handleDeleteParticipant() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can delete participant records.");
+            return;
+        }
         if (selectedParticipant == null) {
             showError("No Selection", "Select a participant from the table to delete.");
             return;
@@ -231,18 +268,18 @@ public class ParticipantController {
             return;
         }
         Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Participant Details - #" + selectedParticipant.getParticipantId());
-        info.setHeaderText("Name: " + selectedParticipant.getName());
+        info.setTitle("Participant Details — Roll: " + selectedParticipant.getStudentId());
+        info.setHeaderText(selectedParticipant.getName() + " (Roll: " + selectedParticipant.getStudentId() + ")");
         String details = String.format("""
-                Participant ID: %d
-                Student ID: %s
+                Roll: %s
+                Name: %s
                 Email: %s
                 Phone: %s
                 Department: %s
                 Year: %s
                 """,
-                selectedParticipant.getParticipantId(),
                 selectedParticipant.getStudentId(),
+                selectedParticipant.getName(),
                 selectedParticipant.getEmail(),
                 selectedParticipant.getPhone(),
                 selectedParticipant.getDepartment(),
@@ -251,7 +288,6 @@ public class ParticipantController {
         info.setContentText(details);
         info.showAndWait();
     }
-
 
     @FXML
     private void handleSearchParticipants() {
@@ -281,7 +317,7 @@ public class ParticipantController {
         };
         task.setOnSucceeded(e -> {
             registrationsTable.setItems(FXCollections.observableArrayList(task.getValue()));
-            statusLabel.setText("Showing " + task.getValue().size() + " registered event(s) for " + selectedParticipant.getName());
+            statusLabel.setText("Showing " + task.getValue().size() + " registered event(s) for Roll: " + selectedParticipant.getStudentId());
         });
         AppExecutor.getExecutor().submit(task);
     }
@@ -291,7 +327,7 @@ public class ParticipantController {
         Participant p = regParticipantCombo.getValue();
         Event ev = regEventCombo.getValue();
         if (p == null || ev == null) {
-            showError("Selection Required", "Please select both a Participant and an Event.");
+            showError("Selection Required", "Please select both a Participant (Roll) and an Event.");
             return;
         }
         Task<Boolean> task = new Task<>() {
@@ -302,7 +338,7 @@ public class ParticipantController {
         };
         task.setOnSucceeded(e -> {
             loadRegistrations();
-            statusLabel.setText("Registered " + p.getName() + " for " + ev.getEventName());
+            statusLabel.setText("Registered " + p.getName() + " (Roll: " + p.getStudentId() + ") for " + ev.getEventName());
         });
         task.setOnFailed(e -> showError("Registration Failed", task.getException().getMessage()));
         AppExecutor.getExecutor().submit(task);
@@ -324,6 +360,10 @@ public class ParticipantController {
     }
 
     private void updateSelectedAttendance(String newStatus) {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can mark participant attendance.");
+            return;
+        }
         Registration selectedReg = registrationsTable.getSelectionModel().getSelectedItem();
         if (selectedReg == null) {
             showError("Select Registration", "Please select a registration row in the bottom table to mark attendance.");
@@ -342,7 +382,7 @@ public class ParticipantController {
         };
         task.setOnSucceeded(e -> {
             loadRegistrations();
-            statusLabel.setText("Attendance marked as '" + newStatus + "' for " + selectedReg.getParticipantName());
+            statusLabel.setText("Attendance marked as '" + newStatus + "' for Roll: " + selectedReg.getStudentId());
         });
         task.setOnFailed(e -> showError("Attendance Error", task.getException().getMessage()));
         AppExecutor.getExecutor().submit(task);
@@ -374,16 +414,16 @@ public class ParticipantController {
 
     private Participant buildParticipantFromForm(int id) {
         String name = nameField.getText() != null ? nameField.getText().trim() : "";
-        String sid = studentIdField.getText() != null ? studentIdField.getText().trim() : "";
+        String roll = studentIdField.getText() != null ? studentIdField.getText().trim() : "";
         String email = emailField.getText() != null ? emailField.getText().trim() : "";
         String phone = phoneField.getText() != null ? phoneField.getText().trim() : "";
         String dept = departmentCombo.getValue();
         String yr = yearCombo.getValue();
 
-        if (name.isEmpty() || sid.isEmpty() || email.isEmpty() || phone.isEmpty() || dept == null || yr == null) {
-            throw new IllegalArgumentException("All participant fields are required.");
+        if (name.isEmpty() || roll.isEmpty() || email.isEmpty() || phone.isEmpty() || dept == null || yr == null) {
+            throw new IllegalArgumentException("All participant fields (including Roll) are required.");
         }
-        return new Participant(id, name, sid, email, phone, dept, yr);
+        return new Participant(id, name, roll, email, phone, dept, yr);
     }
 
     private void showError(String title, String message) {
@@ -470,5 +510,3 @@ public class ParticipantController {
         SceneNavigator.goForward();
     }
 }
-
-

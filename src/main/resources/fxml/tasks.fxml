@@ -114,7 +114,7 @@
                 </VBox>
             </HBox>
 
-            <VBox spacing="12.0"
+            <VBox fx:id="taskFormBox" spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <GridPane hgap="12.0" vgap="10.0">
                     <columnConstraints>
@@ -190,17 +190,15 @@
 
                 <TableView fx:id="tasksTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="60.0" text="ID"/>
-                        <TableColumn fx:id="colEvent" prefWidth="220.0" text="Event"/>
-                        <TableColumn fx:id="colTaskName" prefWidth="230.0" text="Task Name"/>
-                        <TableColumn fx:id="colAssignedTo" prefWidth="155.0" text="Assigned To"/>
-                        <TableColumn fx:id="colDeadline" prefWidth="105.0" text="Deadline"/>
-                        <TableColumn fx:id="colPriority" prefWidth="95.0" text="Priority"/>
-                        <TableColumn fx:id="colStatus" prefWidth="110.0" text="Status"/>
+                        <TableColumn fx:id="colEvent" text="Event"/>
+                        <TableColumn fx:id="colTaskName" text="Task Name"/>
+                        <TableColumn fx:id="colAssignedTo" text="Assigned To"/>
+                        <TableColumn fx:id="colDeadline" text="Deadline"/>
+                        <TableColumn fx:id="colPriority" text="Priority"/>
+                        <TableColumn fx:id="colStatus" text="Status"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
-

@@ -8,18 +8,19 @@ import com.eventify.util.AppExecutor;
 import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.List;
  */
 public class ScheduleController {
 
+    @FXML
+    private GridPane scheduleFormGrid;
     @FXML
     private ComboBox<Event> eventCombo;
     @FXML
@@ -47,9 +50,16 @@ public class ScheduleController {
     private Label statusLabel;
 
     @FXML
-    private TableView<Schedule> scheduleTable;
+    private Button addScheduleBtn;
     @FXML
-    private TableColumn<Schedule, Number> colId;
+    private Button updateScheduleBtn;
+    @FXML
+    private Button deleteScheduleBtn;
+    @FXML
+    private Button clearScheduleBtn;
+
+    @FXML
+    private TableView<Schedule> scheduleTable;
     @FXML
     private TableColumn<Schedule, String> colEvent;
     @FXML
@@ -70,8 +80,9 @@ public class ScheduleController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
-        colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getScheduleId()));
-        colEvent.setCellValueFactory(c -> new SimpleStringProperty("#" + c.getValue().getEventId() + " - " + c.getValue().getEventName()));
+        applyRolePermissions();
+
+        colEvent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEventName()));
         colActivity.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getActivityName()));
         colDate.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDate()));
         colStart.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStartTime()));
@@ -99,12 +110,37 @@ public class ScheduleController {
             }
         });
 
-                // Responsive: bind schedule table columns to table width
-        if (scheduleTable != null && scheduleTable.getColumns().size() >= 5) {
-            ResponsiveHelper.bindColumnWidths(scheduleTable, 0.08, 0.25, 0.25, 0.20, 0.22);
+        // Responsive: bind schedule table columns to table width
+        if (scheduleTable != null && scheduleTable.getColumns().size() >= 6) {
+            ResponsiveHelper.bindColumnWidths(scheduleTable, 0.24, 0.24, 0.14, 0.10, 0.10, 0.18);
         }
 
         loadSchedules();
+    }
+
+    private void applyRolePermissions() {
+        if (!SessionManager.isOrganizer()) {
+            if (scheduleFormGrid != null) {
+                scheduleFormGrid.setVisible(false);
+                scheduleFormGrid.setManaged(false);
+            }
+            if (addScheduleBtn != null) {
+                addScheduleBtn.setVisible(false);
+                addScheduleBtn.setManaged(false);
+            }
+            if (updateScheduleBtn != null) {
+                updateScheduleBtn.setVisible(false);
+                updateScheduleBtn.setManaged(false);
+            }
+            if (deleteScheduleBtn != null) {
+                deleteScheduleBtn.setVisible(false);
+                deleteScheduleBtn.setManaged(false);
+            }
+            if (clearScheduleBtn != null) {
+                clearScheduleBtn.setVisible(false);
+                clearScheduleBtn.setManaged(false);
+            }
+        }
     }
 
     @FXML
@@ -163,6 +199,10 @@ public class ScheduleController {
 
     @FXML
     private void handleAddSchedule() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can add event schedules.");
+            return;
+        }
         try {
             Schedule s = buildFromForm(0);
             Task<Boolean> task = new Task<>() {
@@ -185,6 +225,10 @@ public class ScheduleController {
 
     @FXML
     private void handleUpdateSchedule() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can update event schedules.");
+            return;
+        }
         if (selectedSchedule == null) {
             showError("No Selection", "Select a schedule entry from the table to edit.");
             return;
@@ -211,6 +255,10 @@ public class ScheduleController {
 
     @FXML
     private void handleDeleteSchedule() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can delete event schedules.");
+            return;
+        }
         if (selectedSchedule == null) {
             showError("No Selection", "Select a schedule entry from the table to delete.");
             return;
@@ -238,16 +286,14 @@ public class ScheduleController {
             return;
         }
         Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Schedule Details - #" + selectedSchedule.getScheduleId());
+        info.setTitle("Schedule Details — " + selectedSchedule.getActivityName());
         info.setHeaderText("Activity: " + selectedSchedule.getActivityName());
         String details = String.format("""
-                Schedule ID: %d
                 Event: %s
                 Date: %s
                 Time: %s - %s
                 Venue: %s
                 """,
-                selectedSchedule.getScheduleId(),
                 selectedSchedule.getEventName(),
                 selectedSchedule.getDate(),
                 selectedSchedule.getStartTime(),
@@ -257,7 +303,6 @@ public class ScheduleController {
         info.setContentText(details);
         info.showAndWait();
     }
-
 
     @FXML
     public void handleClearForm() {
@@ -369,6 +414,3 @@ public class ScheduleController {
         SceneNavigator.goForward();
     }
 }
-
-
-

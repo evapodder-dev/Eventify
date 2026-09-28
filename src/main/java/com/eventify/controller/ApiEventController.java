@@ -34,6 +34,8 @@ public class ApiEventController {
     @FXML
     private Button fetchButton;
     @FXML
+    private Button saveToSqliteBtn;
+    @FXML
     private Label statusLabel;
     @FXML
     private ProgressIndicator loadingIndicator;
@@ -42,8 +44,6 @@ public class ApiEventController {
 
     @FXML
     private TableView<ApiEvent> apiEventsTable;
-    @FXML
-    private TableColumn<ApiEvent, Number> colId;
     @FXML
     private TableColumn<ApiEvent, String> colTitle;
     @FXML
@@ -63,9 +63,12 @@ public class ApiEventController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
+        if (!SessionManager.isOrganizer() && saveToSqliteBtn != null) {
+            saveToSqliteBtn.setVisible(false);
+            saveToSqliteBtn.setManaged(false);
+        }
         apiUrlField.setText(apiEventService.getDefaultApiUrl());
 
-        colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getId()));
         colTitle.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTitle()));
         colCategory.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCategory()));
         colDate.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDate()));

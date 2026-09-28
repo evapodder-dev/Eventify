@@ -129,7 +129,7 @@
                     <Button onAction="#handleLoadFallback" prefHeight="34.0"
                             style="-fx-background-color: #0f766e; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Load Local JSON Fallback"/>
-                    <Button onAction="#handleSaveSelectedToSqlite" prefHeight="34.0"
+                    <Button fx:id="saveToSqliteBtn" onAction="#handleSaveSelectedToSqlite" prefHeight="34.0"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Save Selected to SQLite"/>
                 </HBox>
@@ -145,12 +145,11 @@
                 </Label>
                 <TableView fx:id="apiEventsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" prefWidth="60.0" text="API ID"/>
-                        <TableColumn fx:id="colTitle" prefWidth="240.0" text="Event Title"/>
-                        <TableColumn fx:id="colCategory" prefWidth="140.0" text="Category"/>
-                        <TableColumn fx:id="colDate" prefWidth="105.0" text="Date"/>
-                        <TableColumn fx:id="colVenue" prefWidth="175.0" text="Venue"/>
-                        <TableColumn fx:id="colOrganizer" prefWidth="165.0" text="Organizer"/>
+                        <TableColumn fx:id="colTitle" prefWidth="260.0" text="Event Title"/>
+                        <TableColumn fx:id="colCategory" prefWidth="150.0" text="Category"/>
+                        <TableColumn fx:id="colDate" prefWidth="115.0" text="Date"/>
+                        <TableColumn fx:id="colVenue" prefWidth="185.0" text="Venue"/>
+                        <TableColumn fx:id="colOrganizer" prefWidth="175.0" text="Organizer"/>
                         <TableColumn fx:id="colMax" prefWidth="80.0" text="Max Cap"/>
                     </columns>
                 </TableView>

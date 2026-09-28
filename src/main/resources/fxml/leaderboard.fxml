@@ -115,7 +115,7 @@
 
             <VBox spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
-                <GridPane hgap="12.0" vgap="10.0">
+                <GridPane fx:id="leaderboardFormGrid" hgap="12.0" vgap="10.0">
                     <columnConstraints>
                         <ColumnConstraints percentWidth="32.0"/>
                         <ColumnConstraints percentWidth="28.0"/>
@@ -129,7 +129,7 @@
                     </VBox>
 
                     <VBox spacing="4.0" GridPane.columnIndex="1">
-                        <Label text="Select Participant *" textFill="#334155"/>
+                        <Label text="Select Participant (Roll) *" textFill="#334155"/>
                         <ComboBox fx:id="participantCombo" maxWidth="Infinity" promptText="Choose Participant"/>
                     </VBox>
 
@@ -145,19 +145,19 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Button onAction="#handleSaveResult" prefHeight="34.0"
+                    <Button fx:id="addResultBtn" onAction="#handleSaveResult" prefHeight="34.0"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Add Result"/>
-                    <Button onAction="#handleUpdateResult" prefHeight="34.0"
+                    <Button fx:id="updateResultBtn" onAction="#handleUpdateResult" prefHeight="34.0"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Update Result"/>
-                    <Button onAction="#handleDeleteResult" prefHeight="34.0"
+                    <Button fx:id="deleteResultBtn" onAction="#handleDeleteResult" prefHeight="34.0"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Result"/>
                     <Button onAction="#handleViewDetails" prefHeight="34.0"
                             style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Details"/>
-                    <Button onAction="#handleClearForm" prefHeight="34.0"
+                    <Button fx:id="clearResultBtn" onAction="#handleClearForm" prefHeight="34.0"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>
                     <HBox HBox.hgrow="ALWAYS"/>
@@ -174,11 +174,10 @@
                 <TableView fx:id="leaderboardTable" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colRank" text="Rank"/>
+                        <TableColumn fx:id="colStudentId" text="Roll"/>
                         <TableColumn fx:id="colParticipant" text="Participant Name"/>
-                        <TableColumn fx:id="colStudentId" text="Student ID"/>
                         <TableColumn fx:id="colScore" text="Score"/>
                         <TableColumn fx:id="colEvent" text="Event Name"/>
-                        <TableColumn fx:id="colResultId" text="Result ID"/>
                     </columns>
                 </TableView>
             </VBox>

@@ -101,22 +101,22 @@
             <VBox spacing="10.0" VBox.vgrow="ALWAYS"
                   style="-fx-background-color: #ffffff; -fx-padding: 14 16; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                    <Label text="1. Participant Management" textFill="#0f172a" HBox.hgrow="ALWAYS">
+                    <Label text="1. Participant Management (By Roll)" textFill="#0f172a" HBox.hgrow="ALWAYS">
                         <font>
                             <Font name="System Bold" size="17.0"/>
                         </font>
                     </Label>
-                    <Label fx:id="statusLabel" text="Select a participant to edit or register for an event" textFill="#0284c7">
+                    <Label fx:id="statusLabel" text="Select a participant to view details or register for an event" textFill="#0284c7">
                         <font>
                             <Font size="12.0"/>
                         </font>
                     </Label>
                 </HBox>
 
-                <GridPane hgap="10.0" vgap="8.0">
+                <GridPane fx:id="participantFormGrid" hgap="10.0" vgap="8.0">
                     <columnConstraints>
-                        <ColumnConstraints percentWidth="20.0"/>
                         <ColumnConstraints percentWidth="16.0"/>
+                        <ColumnConstraints percentWidth="20.0"/>
                         <ColumnConstraints percentWidth="20.0"/>
                         <ColumnConstraints percentWidth="16.0"/>
                         <ColumnConstraints percentWidth="14.0"/>
@@ -124,12 +124,12 @@
                     </columnConstraints>
 
                     <VBox spacing="3.0" GridPane.columnIndex="0">
-                        <Label text="Full Name *" textFill="#334155"/>
-                        <TextField fx:id="nameField" promptText="Tanvir Ahmed"/>
+                        <Label text="Roll *" textFill="#334155"/>
+                        <TextField fx:id="studentIdField" promptText="e.g., 2307032"/>
                     </VBox>
                     <VBox spacing="3.0" GridPane.columnIndex="1">
-                        <Label text="Student ID *" textFill="#334155"/>
-                        <TextField fx:id="studentIdField" promptText="CSE-2023-014"/>
+                        <Label text="Full Name *" textFill="#334155"/>
+                        <TextField fx:id="nameField" promptText="Tanvir Ahmed"/>
                     </VBox>
                     <VBox spacing="3.0" GridPane.columnIndex="2">
                         <Label text="Email *" textFill="#334155"/>
@@ -150,13 +150,13 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <Button onAction="#handleAddParticipant"
+                    <Button fx:id="addParticipantBtn" onAction="#handleAddParticipant"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Add Participant"/>
-                    <Button onAction="#handleUpdateParticipant"
+                    <Button fx:id="updateParticipantBtn" onAction="#handleUpdateParticipant"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Update Participant"/>
-                    <Button onAction="#handleDeleteParticipant"
+                    <Button fx:id="deleteParticipantBtn" onAction="#handleDeleteParticipant"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Participant"/>
                     <Button onAction="#handleViewDetails"
@@ -165,23 +165,22 @@
                     <Button onAction="#handleViewRegisteredEvents"
                             style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Registered Events"/>
-                    <Button onAction="#handleClearParticipantForm"
+                    <Button fx:id="clearParticipantBtn" onAction="#handleClearParticipantForm"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>
                     <HBox HBox.hgrow="ALWAYS"/>
                     <TextField fx:id="searchParticipantField" onKeyReleased="#handleSearchParticipants" prefWidth="230.0"
-                               promptText="Search name, ID, dept..."/>
+                               promptText="Search roll, name, dept..."/>
                 </HBox>
 
                 <TableView fx:id="participantsTable" prefHeight="185.0" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colPartId" prefWidth="55.0" text="ID"/>
-                        <TableColumn fx:id="colPartName" prefWidth="180.0" text="Name"/>
-                        <TableColumn fx:id="colStudentId" prefWidth="130.0" text="Student ID"/>
-                        <TableColumn fx:id="colEmail" prefWidth="200.0" text="Email"/>
-                        <TableColumn fx:id="colPhone" prefWidth="130.0" text="Phone"/>
-                        <TableColumn fx:id="colDepartment" prefWidth="100.0" text="Department"/>
-                        <TableColumn fx:id="colYear" prefWidth="100.0" text="Year"/>
+                        <TableColumn fx:id="colStudentId" text="Roll"/>
+                        <TableColumn fx:id="colPartName" text="Name"/>
+                        <TableColumn fx:id="colEmail" text="Email"/>
+                        <TableColumn fx:id="colPhone" text="Phone"/>
+                        <TableColumn fx:id="colDepartment" text="Department"/>
+                        <TableColumn fx:id="colYear" text="Year"/>
                     </columns>
                 </TableView>
             </VBox>
@@ -196,26 +195,28 @@
                 </Label>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <ComboBox fx:id="regParticipantCombo" prefWidth="240.0" promptText="Select Participant"/>
+                    <ComboBox fx:id="regParticipantCombo" prefWidth="240.0" promptText="Select Participant (by Roll)"/>
                     <ComboBox fx:id="regEventCombo" prefWidth="260.0" promptText="Select Event to Register"/>
                     <Button onAction="#handleRegisterForEvent"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Register for Event"/>
                     <HBox HBox.hgrow="ALWAYS"/>
-                    <Label text="Mark Selected Attendance:" textFill="#334155">
-                        <font>
-                            <Font name="System Bold" size="12.0"/>
-                        </font>
-                    </Label>
-                    <Button onAction="#handleMarkPresent"
-                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
-                            text="Present"/>
-                    <Button onAction="#handleMarkAbsent"
-                            style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
-                            text="Absent"/>
-                    <Button onAction="#handleMarkNotMarked"
-                            style="-fx-background-color: #64748b; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-cursor: hand;"
-                            text="Not Marked"/>
+                    <HBox fx:id="attendanceControlsBox" alignment="CENTER_LEFT" spacing="8.0">
+                        <Label text="Mark Selected Attendance:" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <Button onAction="#handleMarkPresent"
+                                style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                                text="Present"/>
+                        <Button onAction="#handleMarkAbsent"
+                                style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                                text="Absent"/>
+                        <Button onAction="#handleMarkNotMarked"
+                                style="-fx-background-color: #64748b; -fx-text-fill: #ffffff; -fx-background-radius: 6; -fx-cursor: hand;"
+                                text="Not Marked"/>
+                    </HBox>
                     <Button onAction="#loadRegistrations"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Show All"/>
@@ -223,16 +224,14 @@
 
                 <TableView fx:id="registrationsTable" prefHeight="185.0" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colRegId" prefWidth="70.0" text="Reg ID"/>
-                        <TableColumn fx:id="colRegParticipant" prefWidth="185.0" text="Participant Name"/>
-                        <TableColumn fx:id="colRegStudentId" prefWidth="130.0" text="Student ID"/>
-                        <TableColumn fx:id="colRegEvent" prefWidth="260.0" text="Event Name"/>
-                        <TableColumn fx:id="colRegDate" prefWidth="120.0" text="Registration Date"/>
-                        <TableColumn fx:id="colRegAttendance" prefWidth="140.0" text="Attendance Status"/>
+                        <TableColumn fx:id="colRegStudentId" text="Roll"/>
+                        <TableColumn fx:id="colRegParticipant" text="Participant Name"/>
+                        <TableColumn fx:id="colRegEvent" text="Event Name"/>
+                        <TableColumn fx:id="colRegDate" text="Registration Date"/>
+                        <TableColumn fx:id="colRegAttendance" text="Attendance Status"/>
                     </columns>
                 </TableView>
             </VBox>
         </VBox>
     </center>
 </BorderPane>
-

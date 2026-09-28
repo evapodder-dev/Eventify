@@ -8,7 +8,6 @@ import com.eventify.util.AppExecutor;
 import com.eventify.util.ResponsiveHelper;
 import com.eventify.util.SceneNavigator;
 import com.eventify.util.SessionManager;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -19,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +28,8 @@ import java.util.List;
  */
 public class TaskController {
 
+    @FXML
+    private VBox taskFormBox;
     @FXML
     private ComboBox<Event> eventCombo;
     @FXML
@@ -50,8 +52,6 @@ public class TaskController {
     @FXML
     private TableView<Task> tasksTable;
     @FXML
-    private TableColumn<Task, Number> colId;
-    @FXML
     private TableColumn<Task, String> colEvent;
     @FXML
     private TableColumn<Task, String> colTaskName;
@@ -71,6 +71,8 @@ public class TaskController {
     @FXML
     public void initialize() {
         setupNavigationHeader();
+        applyRolePermissions();
+
         priorityCombo.setItems(FXCollections.observableArrayList("Low", "Medium", "High"));
         priorityCombo.setValue("Medium");
         statusCombo.setItems(FXCollections.observableArrayList("Pending", "In Progress", "Completed"));
@@ -81,8 +83,7 @@ public class TaskController {
         filterStatusCombo.setItems(FXCollections.observableArrayList("All", "Pending", "In Progress", "Completed"));
         filterStatusCombo.setValue("All");
 
-        colId.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getTaskId()));
-        colEvent.setCellValueFactory(c -> new SimpleStringProperty("#" + c.getValue().getEventId() + " - " + c.getValue().getEventName()));
+        colEvent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEventName()));
         colTaskName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getTaskName()));
         colAssignedTo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getAssignedTo()));
         colDeadline.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getDeadline()));
@@ -110,12 +111,21 @@ public class TaskController {
             }
         });
 
-                // Responsive: bind task table columns to table width
+        // Responsive: bind task table columns to table width
         if (tasksTable != null && tasksTable.getColumns().size() >= 6) {
-            ResponsiveHelper.bindColumnWidths(tasksTable, 0.06, 0.18, 0.18, 0.14, 0.12, 0.12, 0.10);
+            ResponsiveHelper.bindColumnWidths(tasksTable, 0.22, 0.24, 0.16, 0.14, 0.12, 0.12);
         }
 
         loadTasks();
+    }
+
+    private void applyRolePermissions() {
+        if (!SessionManager.isOrganizer()) {
+            if (taskFormBox != null) {
+                taskFormBox.setVisible(false);
+                taskFormBox.setManaged(false);
+            }
+        }
     }
 
     @FXML
@@ -163,6 +173,10 @@ public class TaskController {
 
     @FXML
     private void handleAddTask() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can add tasks.");
+            return;
+        }
         try {
             Task t = buildFromForm(0);
             javafx.concurrent.Task<Boolean> bgTask = new javafx.concurrent.Task<>() {
@@ -185,6 +199,10 @@ public class TaskController {
 
     @FXML
     private void handleUpdateTask() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can update tasks.");
+            return;
+        }
         if (selectedTask == null) {
             showError("No Selection", "Select a task from the table to update.");
             return;
@@ -211,6 +229,10 @@ public class TaskController {
 
     @FXML
     private void handleCompleteTask() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can mark tasks completed.");
+            return;
+        }
         if (selectedTask == null) {
             showError("No Selection", "Select a task from the table to mark as Completed.");
             return;
@@ -225,7 +247,7 @@ public class TaskController {
         bgTask.setOnSucceeded(e -> {
             handleClearForm();
             loadTasks();
-            statusLabel.setText("Task #" + id + " marked as Completed.");
+            statusLabel.setText("Task marked as Completed.");
         });
         bgTask.setOnFailed(e -> showError("Complete Task Error", bgTask.getException().getMessage()));
         AppExecutor.getExecutor().submit(bgTask);
@@ -233,6 +255,10 @@ public class TaskController {
 
     @FXML
     private void handleDeleteTask() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Access Denied", "Only Organizer/Admin can delete tasks.");
+            return;
+        }
         if (selectedTask == null) {
             showError("No Selection", "Select a task from the table to delete.");
             return;
@@ -363,5 +389,3 @@ public class TaskController {
         SceneNavigator.goForward();
     }
 }
-
-

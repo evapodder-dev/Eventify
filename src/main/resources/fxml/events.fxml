@@ -102,29 +102,29 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 14 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
-                    <Label text="Event Management (SQLite CRUD &amp; JSON Import/Export)" textFill="#0f172a">
+                    <Label text="Event Management" textFill="#0f172a">
                         <font>
                             <Font name="System Bold" size="20.0"/>
                         </font>
                     </Label>
-                    <Label fx:id="statusLabel" text="Create, update, delete, search, or export university events" textFill="#64748b">
+                    <Label fx:id="statusLabel" text="Browse, search, and manage university events" textFill="#64748b">
                         <font>
                             <Font size="12.0"/>
                         </font>
                     </Label>
                 </VBox>
                 <ProgressIndicator fx:id="loadingIndicator" maxHeight="24.0" maxWidth="24.0" visible="false"/>
-                <Button onAction="#handleExportJson" prefHeight="34.0"
+                <Button fx:id="exportJsonBtn" onAction="#handleExportJson" prefHeight="34.0"
                         style="-fx-background-color: #0f766e; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                         text="Export Event (JSON)"/>
-                <Button onAction="#handleImportJson" prefHeight="34.0"
+                <Button fx:id="importJsonBtn" onAction="#handleImportJson" prefHeight="34.0"
                         style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                         text="Import Event (JSON)"/>
             </HBox>
 
             <VBox spacing="12.0"
                   style="-fx-background-color: #ffffff; -fx-padding: 16 18; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
-                <GridPane hgap="12.0" vgap="10.0">
+                <GridPane fx:id="eventFormGrid" hgap="12.0" vgap="10.0">
                     <columnConstraints>
                         <ColumnConstraints percentWidth="25.0"/>
                         <ColumnConstraints percentWidth="25.0"/>
@@ -184,19 +184,19 @@
                 </GridPane>
 
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Button onAction="#handleAddEvent" prefHeight="34.0"
+                    <Button fx:id="addEventBtn" onAction="#handleAddEvent" prefHeight="34.0"
                             style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Add Event"/>
-                    <Button onAction="#handleUpdateEvent" prefHeight="34.0"
+                    <Button fx:id="updateEventBtn" onAction="#handleUpdateEvent" prefHeight="34.0"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Update Event"/>
-                    <Button onAction="#handleDeleteEvent" prefHeight="34.0"
+                    <Button fx:id="deleteEventBtn" onAction="#handleDeleteEvent" prefHeight="34.0"
                             style="-fx-background-color: #dc2626; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Delete Event"/>
                     <Button onAction="#handleViewDetails" prefHeight="34.0"
                             style="-fx-background-color: #475569; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Event Details"/>
-                    <Button onAction="#handleClearForm" prefHeight="34.0"
+                    <Button fx:id="clearEventBtn" onAction="#handleClearForm" prefHeight="34.0"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-font-weight: bold; -fx-padding: 0 16; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Clear"/>
                     <HBox HBox.hgrow="ALWAYS"/>
@@ -226,7 +226,6 @@
 
                 <TableView fx:id="eventsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" text="ID"/>
                         <TableColumn fx:id="colName" text="Event Name"/>
                         <TableColumn fx:id="colCategory" text="Category"/>
                         <TableColumn fx:id="colDate" text="Date"/>
@@ -242,6 +241,3 @@
         </VBox>
     </center>
 </BorderPane>
-
-
-

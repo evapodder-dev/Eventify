@@ -37,7 +37,7 @@ public class Participant extends User {
 
     @Override
     public String getAccessSummary() {
-        return "Participant Access — View Events, Schedules, Leaderboards & Registrations";
+        return "Participant Access (View & Register Only) — Admin controls are restricted";
     }
 
     @Override
@@ -97,7 +97,7 @@ public class Participant extends User {
     @Override
     public String toString() {
         if (studentId != null && !studentId.isBlank()) {
-            return getName() + " [" + studentId + "]";
+            return getName() + " (Roll: " + studentId + ")";
         }
         return super.toString();
     }

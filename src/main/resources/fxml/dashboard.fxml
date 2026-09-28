@@ -260,7 +260,6 @@
                 </HBox>
                 <TableView fx:id="recentEventsTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colId" text="ID"/>
                         <TableColumn fx:id="colName" text="Event Name"/>
                         <TableColumn fx:id="colCategory" text="Category"/>
                         <TableColumn fx:id="colDate" text="Date"/>
