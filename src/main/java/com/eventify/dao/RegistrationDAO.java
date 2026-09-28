@@ -133,6 +133,66 @@ public class RegistrationDAO {
         }
     }
 
+    public boolean registerByRoll(String roll, int eventId) {
+        String trimmedRoll = roll != null ? roll.trim() : "";
+        String ensurePartSql = """
+            INSERT OR IGNORE INTO participants (name, student_id, email, phone, department, year)
+            VALUES (?, ?, ?, '01700000000', 'CSE', '3rd Year')
+            """;
+        String findPartSql = "SELECT participant_id FROM participants WHERE student_id = ?";
+
+        int participantId = 0;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            try (PreparedStatement ensurePs = conn.prepareStatement(ensurePartSql)) {
+                ensurePs.setString(1, "Participant (" + trimmedRoll + ")");
+                ensurePs.setString(2, trimmedRoll);
+                ensurePs.setString(3, trimmedRoll + "@student.university.edu");
+                ensurePs.executeUpdate();
+            }
+            try (PreparedStatement findPs = conn.prepareStatement(findPartSql)) {
+                findPs.setString(1, trimmedRoll);
+                try (ResultSet rs = findPs.executeQuery()) {
+                    if (rs.next()) {
+                        participantId = rs.getInt("participant_id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to prepare participant roll for registration: " + e.getMessage(), e);
+        }
+
+        if (participantId <= 0) {
+            throw new DatabaseException("Could not find or create participant record for Roll: " + trimmedRoll);
+        }
+        return registerParticipant(participantId, eventId);
+    }
+
+    public List<Registration> findByRoll(String roll) {
+        String trimmedRoll = roll != null ? roll.trim() : "";
+        String sql = """
+            SELECT r.registration_id, r.participant_id, p.name AS participant_name, p.student_id,
+                   r.event_id, e.event_name, r.registration_date, r.attendance_status
+            FROM registrations r
+            JOIN participants p ON r.participant_id = p.participant_id
+            JOIN events e ON r.event_id = e.event_id
+            WHERE p.student_id = ?
+            ORDER BY r.registration_id DESC
+            """;
+        List<Registration> list = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, trimmedRoll);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to load registrations for Roll " + trimmedRoll + ": " + e.getMessage(), e);
+        }
+    }
+
     private Registration mapRow(ResultSet rs) throws SQLException {
         return new Registration(
                 rs.getInt("registration_id"),

@@ -25,7 +25,9 @@ public class SessionManager {
     }
 
     public static boolean isOrganizer() {
-        return currentUser != null && currentUser.canManageSystem();
+        return currentUser != null
+                && "admin".equalsIgnoreCase(currentUser.getUsername())
+                && currentUser.canManageSystem();
     }
 
     public static void clearSession() {

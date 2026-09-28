@@ -50,6 +50,12 @@ public class ScheduleController {
     private Label statusLabel;
 
     @FXML
+    private Button navEventsBtn;
+    @FXML
+    private Button navParticipantsBtn;
+    @FXML
+    private Button navTasksBtn;
+    @FXML
     private Button addScheduleBtn;
     @FXML
     private Button updateScheduleBtn;
@@ -120,6 +126,17 @@ public class ScheduleController {
 
     private void applyRolePermissions() {
         if (!SessionManager.isOrganizer()) {
+            if (navParticipantsBtn != null) {
+                navParticipantsBtn.setVisible(false);
+                navParticipantsBtn.setManaged(false);
+            }
+            if (navTasksBtn != null) {
+                navTasksBtn.setVisible(false);
+                navTasksBtn.setManaged(false);
+            }
+            if (navEventsBtn != null) {
+                navEventsBtn.setText("Events & Registration");
+            }
             if (scheduleFormGrid != null) {
                 scheduleFormGrid.setVisible(false);
                 scheduleFormGrid.setManaged(false);
@@ -345,21 +362,29 @@ public class ScheduleController {
 
     @FXML
     private void goToEvents() {
-        SceneNavigator.navigateTo("events.fxml", "Event Management");
+        SceneNavigator.navigateTo("events.fxml", SessionManager.isOrganizer() ? "Event Management" : "Events & Registration");
     }
 
     @FXML
     private void goToParticipants() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can control Participants & Attendance.");
+            return;
+        }
         SceneNavigator.navigateTo("participants.fxml", "Participants & Attendance");
     }
 
     @FXML
     private void goToSchedule() {
-        SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
+        SceneNavigator.navigateTo("schedule.fxml", "Schedule");
     }
 
     @FXML
     private void goToTasks() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can manage organizer tasks.");
+            return;
+        }
         SceneNavigator.navigateTo("tasks.fxml", "Task Management");
     }
 

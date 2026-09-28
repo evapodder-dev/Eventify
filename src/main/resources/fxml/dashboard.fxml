@@ -42,16 +42,16 @@
             <Button maxWidth="Infinity" onAction="#goToDashboard" prefHeight="38.0"
                     style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Dashboard"/>
-            <Button maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
+            <Button fx:id="navEventsBtn" maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Events"/>
-            <Button maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
+            <Button fx:id="navParticipantsBtn" maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Participants &amp; Attendance"/>
             <Button maxWidth="Infinity" onAction="#goToSchedule" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Schedule"/>
-            <Button maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
+            <Button fx:id="navTasksBtn" maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Tasks"/>
             <Button maxWidth="Infinity" onAction="#goToLeaderboard" prefHeight="38.0"
@@ -201,7 +201,7 @@
                     </Label>
                 </VBox>
 
-                <VBox spacing="6.0" GridPane.columnIndex="4"
+                <VBox fx:id="pendingTasksCard" spacing="6.0" GridPane.columnIndex="4"
                       style="-fx-background-color: #ffffff; -fx-padding: 18; -fx-background-radius: 10; -fx-border-color: #fed7aa; -fx-border-radius: 10;">
                     <Label text="PENDING TASKS" textFill="#ea580c">
                         <font>
@@ -236,26 +236,29 @@
                     </Label>
                 </HBox>
 
-                                <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Label text="Quick Navigate:" textFill="#475569">
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Label text="Quick Actions:" textFill="#475569">
                         <font>
                             <Font name="System Bold" size="12.0"/>
                         </font>
                     </Label>
-                    <Button onAction="#goToEvents"
+                    <Button fx:id="quickEventsBtn" onAction="#goToEvents"
                             style="-fx-background-color: #0284c7; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Manage Events &#8594;"/>
+                    <Button fx:id="quickRegisterBtn" onAction="#handleRegisterSelectedEvent"
+                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            text="Register for Selected Event"/>
                     <Button onAction="#handleJumpToSelectedEventSchedule"
                             style="-fx-background-color: #0f766e; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="View Selected Event Schedule &#8594;"/>
-                    <Button onAction="#goToParticipants"
+                    <Button fx:id="quickParticipantsBtn" onAction="#goToParticipants"
                             style="-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Participants &amp; Attendance &#8594;"/>
-                    <Button onAction="#goToTasks"
+                    <Button fx:id="quickTasksBtn" onAction="#goToTasks"
                             style="-fx-background-color: #ea580c; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Pending Tasks &#8594;"/>
                     <Button onAction="#goToLeaderboard"
-                            style="-fx-background-color: #16a34a; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
+                            style="-fx-background-color: #4f46e5; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"
                             text="Leaderboard &#8594;"/>
                 </HBox>
                 <TableView fx:id="recentEventsTable" VBox.vgrow="ALWAYS">

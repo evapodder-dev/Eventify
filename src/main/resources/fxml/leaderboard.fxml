@@ -43,16 +43,16 @@
             <Button maxWidth="Infinity" onAction="#goToDashboard" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Dashboard"/>
-            <Button maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
+            <Button fx:id="navEventsBtn" maxWidth="Infinity" onAction="#goToEvents" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Events"/>
-            <Button maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
+            <Button fx:id="navParticipantsBtn" maxWidth="Infinity" onAction="#goToParticipants" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Participants &amp; Attendance"/>
             <Button maxWidth="Infinity" onAction="#goToSchedule" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Schedule"/>
-            <Button maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
+            <Button fx:id="navTasksBtn" maxWidth="Infinity" onAction="#goToTasks" prefHeight="38.0"
                     style="-fx-background-color: #1e293b; -fx-text-fill: #e2e8f0; -fx-alignment: CENTER_LEFT; -fx-padding: 0 14; -fx-background-radius: 6; -fx-cursor: hand;"
                     text="Tasks"/>
             <Button maxWidth="Infinity" onAction="#goToLeaderboard" prefHeight="38.0"

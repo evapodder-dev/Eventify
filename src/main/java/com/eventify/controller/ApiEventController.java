@@ -57,15 +57,35 @@ public class ApiEventController {
     @FXML
     private TableColumn<ApiEvent, Number> colMax;
 
+    @FXML
+    private Button navEventsBtn;
+    @FXML
+    private Button navParticipantsBtn;
+    @FXML
+    private Button navTasksBtn;
+
     private final ApiEventService apiEventService = new ApiEventService();
     private final EventService eventService = new EventService();
 
     @FXML
     public void initialize() {
         setupNavigationHeader();
-        if (!SessionManager.isOrganizer() && saveToSqliteBtn != null) {
-            saveToSqliteBtn.setVisible(false);
-            saveToSqliteBtn.setManaged(false);
+        if (!SessionManager.isOrganizer()) {
+            if (saveToSqliteBtn != null) {
+                saveToSqliteBtn.setVisible(false);
+                saveToSqliteBtn.setManaged(false);
+            }
+            if (navParticipantsBtn != null) {
+                navParticipantsBtn.setVisible(false);
+                navParticipantsBtn.setManaged(false);
+            }
+            if (navTasksBtn != null) {
+                navTasksBtn.setVisible(false);
+                navTasksBtn.setManaged(false);
+            }
+            if (navEventsBtn != null) {
+                navEventsBtn.setText("Events & Registration");
+            }
         }
         apiUrlField.setText(apiEventService.getDefaultApiUrl());
 
@@ -144,6 +164,10 @@ public class ApiEventController {
 
     @FXML
     private void handleSaveSelectedToSqlite() {
+        if (!SessionManager.isOrganizer()) {
+            showAlert(Alert.AlertType.WARNING, "Admin Only", "Only Admin (EVA PODDER) can import API events into SQLite.");
+            return;
+        }
         ApiEvent selected = apiEventsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "No Selection", "Select an API Event row in the table to import into SQLite.");
@@ -196,21 +220,29 @@ public class ApiEventController {
 
     @FXML
     private void goToEvents() {
-        SceneNavigator.navigateTo("events.fxml", "Event Management");
+        SceneNavigator.navigateTo("events.fxml", SessionManager.isOrganizer() ? "Event Management" : "Events & Registration");
     }
 
     @FXML
     private void goToParticipants() {
+        if (!SessionManager.isOrganizer()) {
+            showAlert(Alert.AlertType.WARNING, "Admin Only", "Only Admin (EVA PODDER) can control Participants & Attendance.");
+            return;
+        }
         SceneNavigator.navigateTo("participants.fxml", "Participants & Attendance");
     }
 
     @FXML
     private void goToSchedule() {
-        SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
+        SceneNavigator.navigateTo("schedule.fxml", "Schedule");
     }
 
     @FXML
     private void goToTasks() {
+        if (!SessionManager.isOrganizer()) {
+            showAlert(Alert.AlertType.WARNING, "Admin Only", "Only Admin (EVA PODDER) can manage organizer tasks.");
+            return;
+        }
         SceneNavigator.navigateTo("tasks.fxml", "Task Management");
     }
 

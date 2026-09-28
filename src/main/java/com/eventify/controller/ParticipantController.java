@@ -142,6 +142,14 @@ public class ParticipantController {
     private void applyRolePermissions() {
         boolean isOrganizer = SessionManager.isOrganizer();
         if (!isOrganizer) {
+            if (participantFormGrid != null) {
+                participantFormGrid.setVisible(false);
+                participantFormGrid.setManaged(false);
+            }
+            if (addParticipantBtn != null) {
+                addParticipantBtn.setVisible(false);
+                addParticipantBtn.setManaged(false);
+            }
             if (updateParticipantBtn != null) {
                 updateParticipantBtn.setVisible(false);
                 updateParticipantBtn.setManaged(false);
@@ -149,6 +157,10 @@ public class ParticipantController {
             if (deleteParticipantBtn != null) {
                 deleteParticipantBtn.setVisible(false);
                 deleteParticipantBtn.setManaged(false);
+            }
+            if (clearParticipantBtn != null) {
+                clearParticipantBtn.setVisible(false);
+                clearParticipantBtn.setManaged(false);
             }
             if (attendanceControlsBox != null) {
                 attendanceControlsBox.setVisible(false);
@@ -185,6 +197,10 @@ public class ParticipantController {
 
     @FXML
     private void handleAddParticipant() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can add or manage participants.");
+            return;
+        }
         try {
             Participant p = buildParticipantFromForm(0);
             Task<Boolean> task = new Task<>() {

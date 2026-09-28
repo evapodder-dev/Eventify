@@ -153,8 +153,8 @@ public class DatabaseInitializer {
 
             // Ensure Organizer name is set to EVA PODDER and Roll numbers use numeric format (e.g., 2307032)
             try (Statement s = conn.createStatement()) {
-                s.execute("UPDATE users SET full_name = 'EVA PODDER', email = 'evapodder@university.edu' WHERE username = 'admin'");
-                s.execute("UPDATE users SET full_name = username WHERE role = 'Participant'");
+                s.execute("UPDATE users SET full_name = 'EVA PODDER', email = 'evapodder@university.edu', role = 'Organizer' WHERE LOWER(username) = 'admin'");
+                s.execute("UPDATE users SET role = 'Participant', full_name = username WHERE LOWER(username) != 'admin'");
                 s.execute("INSERT OR IGNORE INTO users (username, password, full_name, email, role) VALUES ('2307032', 'student123', '2307032', '2307032@student.university.edu', 'Participant')");
                 s.execute("UPDATE events SET organizer = 'EVA PODDER' WHERE organizer IN ('CSE Computer Club', 'Department of CSE', 'IEEE Student Branch')");
                 s.execute("UPDATE participants SET student_id = '2307032' WHERE student_id = 'CSE-2023-014'");

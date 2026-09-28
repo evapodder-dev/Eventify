@@ -123,16 +123,6 @@
                                        promptText="Enter password"
                                        style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"/>
                     </VBox>
-
-                    <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                        <Label text="Account Role (Used for Sign Up)" textFill="#1e293b">
-                            <font>
-                                <Font name="System Bold" size="13.0"/>
-                            </font>
-                        </Label>
-                        <ComboBox fx:id="roleCombo" prefHeight="38.0" maxWidth="Infinity"
-                                  promptText="Select Role (Participant or Organizer)"/>
-                    </VBox>
                 </GridPane>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">

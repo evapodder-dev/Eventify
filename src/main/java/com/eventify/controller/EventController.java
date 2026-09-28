@@ -1,6 +1,9 @@
 package com.eventify.controller;
 
+import com.eventify.dao.RegistrationDAO;
 import com.eventify.model.Event;
+import com.eventify.model.Registration;
+import com.eventify.model.User;
 import com.eventify.service.EventService;
 import com.eventify.util.AppExecutor;
 import com.eventify.util.JsonUtil;
@@ -29,9 +32,18 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Controller for events.fxml handling Event CRUD, search, details view, and JSON export/import.
+ * Controller for events.fxml handling Event CRUD (Admin) and Event Browsing & Registration (Participant).
  */
 public class EventController {
+
+    @FXML
+    private Button navEventsBtn;
+    @FXML
+    private Button navParticipantsBtn;
+    @FXML
+    private Button navTasksBtn;
+    @FXML
+    private Label pageTitleLabel;
 
     @FXML
     private GridPane eventFormGrid;
@@ -76,6 +88,10 @@ public class EventController {
     private Button deleteEventBtn;
     @FXML
     private Button clearEventBtn;
+    @FXML
+    private Button registerEventBtn;
+    @FXML
+    private Button myRegistrationsBtn;
 
     @FXML
     private TableView<Event> eventsTable;
@@ -99,6 +115,7 @@ public class EventController {
     private TableColumn<Event, String> colStatus;
 
     private final EventService eventService = new EventService();
+    private final RegistrationDAO registrationDAO = new RegistrationDAO();
     private Event selectedEvent;
 
     @FXML
@@ -124,11 +141,20 @@ public class EventController {
         colVenue.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getVenue()));
         colOrganizer.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getOrganizer()));
         colMax.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().getMaxParticipants()));
-        colStatus.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
+        colStatus.setCellValueFactory(c -> {
+            String st = c.getValue().getStatus();
+            if (!SessionManager.isOrganizer()) {
+                if ("Upcoming".equalsIgnoreCase(st) || "Ongoing".equalsIgnoreCase(st)) {
+                    return new SimpleStringProperty(st + " (Open)");
+                }
+                return new SimpleStringProperty(st + " (Closed)");
+            }
+            return new SimpleStringProperty(st);
+        });
 
         // Responsive: bind columns to percentages of table width
         ResponsiveHelper.bindColumnWidths(eventsTable,
-                0.20, 0.13, 0.11, 0.08, 0.08, 0.14, 0.12, 0.06, 0.08);
+                0.20, 0.13, 0.10, 0.07, 0.07, 0.14, 0.11, 0.06, 0.12);
 
         // Make search field responsive — stretch to fill available space
         searchField.maxWidthProperty().bind(eventsTable.widthProperty().multiply(0.4));
@@ -144,6 +170,20 @@ public class EventController {
 
     private void applyRolePermissions() {
         if (!SessionManager.isOrganizer()) {
+            if (navParticipantsBtn != null) {
+                navParticipantsBtn.setVisible(false);
+                navParticipantsBtn.setManaged(false);
+            }
+            if (navTasksBtn != null) {
+                navTasksBtn.setVisible(false);
+                navTasksBtn.setManaged(false);
+            }
+            if (navEventsBtn != null) {
+                navEventsBtn.setText("Events & Registration");
+            }
+            if (pageTitleLabel != null) {
+                pageTitleLabel.setText("Available University Events & Registration");
+            }
             if (eventFormGrid != null) {
                 eventFormGrid.setVisible(false);
                 eventFormGrid.setManaged(false);
@@ -171,6 +211,15 @@ public class EventController {
             if (importJsonBtn != null) {
                 importJsonBtn.setVisible(false);
                 importJsonBtn.setManaged(false);
+            }
+        } else {
+            if (registerEventBtn != null) {
+                registerEventBtn.setVisible(false);
+                registerEventBtn.setManaged(false);
+            }
+            if (myRegistrationsBtn != null) {
+                myRegistrationsBtn.setVisible(false);
+                myRegistrationsBtn.setManaged(false);
             }
         }
     }
@@ -224,6 +273,10 @@ public class EventController {
 
     @FXML
     private void handleAddEvent() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can add events.");
+            return;
+        }
         try {
             Event event = buildEventFromForm(0);
             Task<Boolean> addTask = new Task<>() {
@@ -246,6 +299,10 @@ public class EventController {
 
     @FXML
     private void handleUpdateEvent() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can update events.");
+            return;
+        }
         if (selectedEvent == null) {
             showError("No Selection", "Please select an event from the table to update.");
             return;
@@ -272,6 +329,10 @@ public class EventController {
 
     @FXML
     private void handleDeleteEvent() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can delete events.");
+            return;
+        }
         if (selectedEvent == null) {
             showError("No Selection", "Please select an event from the table to delete.");
             return;
@@ -293,6 +354,80 @@ public class EventController {
     }
 
     @FXML
+    private void handleRegisterSelectedEvent() {
+        if (selectedEvent == null) {
+            showError("No Event Selected", "Please select an Upcoming or Ongoing event from the table below to register.");
+            return;
+        }
+        if ("Completed".equalsIgnoreCase(selectedEvent.getStatus())) {
+            showError("Registration Closed", "Registration is closed for '" + selectedEvent.getEventName()
+                    + "' because it is already Completed.\nPlease select an Upcoming or Ongoing event.");
+            return;
+        }
+        User user = SessionManager.getCurrentUser();
+        String roll = user != null ? user.getUsername() : "2307032";
+        Event targetEvent = selectedEvent;
+
+        Task<Boolean> regTask = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return registrationDAO.registerByRoll(roll, targetEvent.getEventId());
+            }
+        };
+        regTask.setOnSucceeded(e -> {
+            statusLabel.setText("Successfully registered Roll " + roll + " for '" + targetEvent.getEventName() + "'!");
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Registration Successful");
+            info.setHeaderText("Roll " + roll + " Registered!");
+            info.setContentText("Event: " + targetEvent.getEventName()
+                    + "\nCategory: " + targetEvent.getCategory()
+                    + "\nDate: " + targetEvent.getDate() + " (" + targetEvent.getStartTime() + " - " + targetEvent.getEndTime() + ")"
+                    + "\nVenue: " + targetEvent.getVenue());
+            info.showAndWait();
+        });
+        regTask.setOnFailed(e -> {
+            Throwable ex = regTask.getException();
+            showError("Registration Notice", ex != null ? ex.getMessage() : "Could not register for event.");
+        });
+        AppExecutor.getExecutor().submit(regTask);
+    }
+
+    @FXML
+    private void handleViewMyRegistrations() {
+        User user = SessionManager.getCurrentUser();
+        String roll = user != null ? user.getUsername() : "2307032";
+
+        Task<List<Registration>> task = new Task<>() {
+            @Override
+            protected List<Registration> call() {
+                return registrationDAO.findByRoll(roll);
+            }
+        };
+        task.setOnSucceeded(e -> {
+            List<Registration> regs = task.getValue();
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("My Registered Events — Roll: " + roll);
+            info.setHeaderText("Registered Events for Roll: " + roll + " (" + regs.size() + " event(s))");
+            if (regs.isEmpty()) {
+                info.setContentText("You have not registered for any events yet.\nSelect an Upcoming or Ongoing event from the table and click 'Register for Selected Event'.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < regs.size(); i++) {
+                    Registration r = regs.get(i);
+                    sb.append(i + 1).append(". ").append(r.getEventName())
+                      .append("\n   Registered on: ").append(r.getRegistrationDate())
+                      .append(" | Attendance: ").append(r.getAttendanceStatus())
+                      .append("\n\n");
+                }
+                info.setContentText(sb.toString());
+            }
+            info.showAndWait();
+        });
+        task.setOnFailed(e -> showError("Error", "Could not load registered events."));
+        AppExecutor.getExecutor().submit(task);
+    }
+
+    @FXML
     private void handleViewDetails() {
         if (selectedEvent == null) {
             showError("No Selection", "Select an event in the table to view its full details.");
@@ -301,8 +436,12 @@ public class EventController {
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setTitle("Event Details — " + selectedEvent.getEventName());
         info.setHeaderText(selectedEvent.getEventName() + " (" + selectedEvent.getCategory() + ")");
+        String regOpen = ("Completed".equalsIgnoreCase(selectedEvent.getStatus()))
+                ? "Closed (Event Completed)"
+                : "Open for Registration";
         String details = String.format("""
                 Status: %s
+                Registration: %s
                 Date: %s
                 Time: %s - %s
                 Venue: %s
@@ -313,6 +452,7 @@ public class EventController {
                 %s
                 """,
                 selectedEvent.getStatus(),
+                regOpen,
                 selectedEvent.getDate(),
                 selectedEvent.getStartTime(),
                 selectedEvent.getEndTime(),
@@ -466,21 +606,29 @@ public class EventController {
 
     @FXML
     private void goToEvents() {
-        SceneNavigator.navigateTo("events.fxml", "Event Management");
+        SceneNavigator.navigateTo("events.fxml", SessionManager.isOrganizer() ? "Event Management" : "Events & Registration");
     }
 
     @FXML
     private void goToParticipants() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can control Participants & Attendance.");
+            return;
+        }
         SceneNavigator.navigateTo("participants.fxml", "Participants & Attendance");
     }
 
     @FXML
     private void goToSchedule() {
-        SceneNavigator.navigateTo("schedule.fxml", "Schedule Management");
+        SceneNavigator.navigateTo("schedule.fxml", "Schedule");
     }
 
     @FXML
     private void goToTasks() {
+        if (!SessionManager.isOrganizer()) {
+            showError("Admin Only", "Only Admin (EVA PODDER) can manage organizer tasks.");
+            return;
+        }
         SceneNavigator.navigateTo("tasks.fxml", "Task Management");
     }
 

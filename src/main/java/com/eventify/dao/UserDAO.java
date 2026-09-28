@@ -37,9 +37,8 @@ public class UserDAO {
                         String pwd = rs.getString("password");
                         String fullName = rs.getString("full_name");
                         String email = rs.getString("email");
-                        String role = rs.getString("role");
 
-                        if ("Organizer".equalsIgnoreCase(role)) {
+                        if ("admin".equalsIgnoreCase(uname)) {
                             return Optional.of(new Organizer(id, uname, pwd, fullName, email));
                         } else {
                             return Optional.of(new Participant(id, uname, pwd, uname, email));
@@ -77,13 +76,15 @@ public class UserDAO {
     }
 
     /**
-     * Registers a new user account (Sign Up) in SQLite.
-     * Avoids Statement.RETURN_GENERATED_KEYS because sqlite-jdbc 3.44 throws SQLFeatureNotSupportedException.
-     * If the role is Participant, also ensures a corresponding participant record exists by Roll.
+     * Registers a new Participant account (Sign Up) in SQLite.
+     * Only 'admin' can be an Organizer; all Sign Up accounts are strictly Participant Rolls.
      */
     public User registerUser(String username, String password, String role) {
         String trimmedUser = username != null ? username.trim() : "";
-        String normalizedRole = "Organizer".equalsIgnoreCase(role) ? "Organizer" : "Participant";
+        if ("admin".equalsIgnoreCase(trimmedUser)) {
+            throw new DatabaseException("The 'admin' account is reserved for the Organizer. Please click 'Sign In' to log in as admin.");
+        }
+        String normalizedRole = "Participant";
         String email = trimmedUser + "@student.university.edu";
 
         String upsertUserSql = """
@@ -92,7 +93,7 @@ public class UserDAO {
             ON CONFLICT(username) DO UPDATE SET
                 password = excluded.password,
                 full_name = excluded.full_name,
-                role = excluded.role
+                role = 'Participant'
             """;
         String findIdSql = "SELECT user_id FROM users WHERE username = ?";
 
@@ -116,21 +117,17 @@ public class UserDAO {
                 }
             }
 
-            if ("Participant".equalsIgnoreCase(normalizedRole)) {
-                String insertParticipantSql = """
-                    INSERT OR IGNORE INTO participants (name, student_id, email, phone, department, year)
-                    VALUES (?, ?, ?, '01700000000', 'CSE', '3rd Year')
-                    """;
-                try (PreparedStatement partPs = conn.prepareStatement(insertParticipantSql)) {
-                    partPs.setString(1, "Participant (" + trimmedUser + ")");
-                    partPs.setString(2, trimmedUser);
-                    partPs.setString(3, email);
-                    partPs.executeUpdate();
-                }
-                return new Participant(newUserId, trimmedUser, password, trimmedUser, email);
-            } else {
-                return new Organizer(newUserId, trimmedUser, password, trimmedUser, email);
+            String insertParticipantSql = """
+                INSERT OR IGNORE INTO participants (name, student_id, email, phone, department, year)
+                VALUES (?, ?, ?, '01700000000', 'CSE', '3rd Year')
+                """;
+            try (PreparedStatement partPs = conn.prepareStatement(insertParticipantSql)) {
+                partPs.setString(1, "Participant (" + trimmedUser + ")");
+                partPs.setString(2, trimmedUser);
+                partPs.setString(3, email);
+                partPs.executeUpdate();
             }
+            return new Participant(newUserId, trimmedUser, password, trimmedUser, email);
         } catch (SQLException e) {
             throw new DatabaseException("Failed to sign up user: " + e.getMessage(), e);
         }
