@@ -67,8 +67,12 @@ public class DashboardController {
         setupNavigationHeader();
         User currentUser = SessionManager.getCurrentUser();
         if (currentUser != null) {
-            userRoleLabel.setText("Signed in: " + currentUser.getRole());
-            welcomeLabel.setText("Welcome, " + currentUser.getFullName());
+            userRoleLabel.setText("Signed in: " + currentUser.getRole() + " (" + currentUser.getUsername() + ")");
+            if ("admin".equalsIgnoreCase(currentUser.getUsername())) {
+                welcomeLabel.setText("Welcome, " + currentUser.getUsername() + " (EVA PODDER)");
+            } else {
+                welcomeLabel.setText("Welcome, " + currentUser.getUsername());
+            }
             accessSummaryLabel.setText(currentUser.getAccessSummary());
         }
 
